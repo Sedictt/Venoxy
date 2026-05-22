@@ -103,3 +103,19 @@ html.lenis, html.lenis body {
   pointer-events: none !important;
   transform: translateY(-20px) !important;
 }
+
+/* Custom scrollbar for scrollable lightbox image (long screenshot) */
+.custom-lightbox-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-lightbox-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+.custom-lightbox-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.custom-lightbox-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
