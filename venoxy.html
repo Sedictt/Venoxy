@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="en">
+<head><script data-od-sandbox-shim>(function(){
+  function makeStore(){
+    var data = {};
+    var api = {
+      getItem: function(k){ return Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null; },
+      setItem: function(k, v){ data[k] = String(v); },
+      removeItem: function(k){ delete data[k]; },
+      clear: function(){ data = {}; },
+      key: function(i){ return Object.keys(data)[i] || null; }
+    };
+    Object.defineProperty(api, 'length', { get: function(){ return Object.keys(data).length; } });
+    return api;
+  }
+  function tryShim(name){
+    var works = false;
+    try { works = !!window[name] && typeof window[name].getItem === 'function'; void window[name].length; }
+    catch (_) { works = false; }
+    if (works) return;
+    try { Object.defineProperty(window, name, { configurable: true, value: makeStore() }); }
+    catch (_) { try { window[name] = makeStore(); } catch (__) {} }
+  }
+  tryShim('localStorage');
+  tryShim('sessionStorage');
+  document.addEventListener('click', (e) => {
+    if (!e.target || !(e.target instanceof Element)) return;
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (href === null) return;
+    var isAnchor = href.startsWith('#') || href === '';
+    if (isAnchor) {
+      e.preventDefault();
+      if (href === '' || href === '#') {
+        window.scrollTo({ top: 0 });
+        history.replaceState(null, '', ' ');
+      } else {
+        var targetId = href.slice(1);
+        var target = targetId ? document.getElementById(targetId) : null;
+        if (target) {
+          target.scrollIntoView();
+          location.hash === href && history.replaceState(null, '', ' ');
+          location.hash = href;
+        }
+      }
+    } else if (link.getAttribute('target') === '_blank') {
+      e.preventDefault();
+      let safe = false;
+      try {
+        var url = new URL(href, location.href);
+        safe =
+          url.protocol === 'http:' ||
+          url.protocol === 'https:' ||
+          url.protocol === 'mailto:';
+      } catch (_) {}
+      safe && window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  });
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Venoxy — Creative Web Developer Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Matcha & Milky Theme Tokens */
+            --bg:      #EFE8CA; /* Milky */
+            --surface: #F6F3DF; /* Surface/Card */
+            --fg:      #41462A; /* Text Primary */
+            --muted:   #7A8155; /* Text Secondary */
+            --border:  rgba(158, 167, 107, 0.3); /* Matcha (Transparent) */
+            --accent:  #9EA76B; /* Matcha Primary */
+            --accent-hover: #858D5A; /* Matcha Hover */
+            
+            --font-display: 'Fredoka', sans-serif;
+            --font-body:    'Fredoka', sans-serif;
+            --font-mono:    'JetBrains Mono', monospace;
+            
+            --radius-lg: 40px;
+            --radius-md: 20px;
+            --radius-sm: 10px;
+            
+            --container: 1100px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: var(--font-body);
+            font-weight: 400;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .tag {
+            font-family: var(--font-display);
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: var(--container);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* --- Dynamic Navigation --- */
+        .nav-outer {
+            position: fixed;
+            top: 24px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            pointer-events: none;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .nav-scrolled .nav-outer {
+            transform: translateY(-8px);
+        }
+
+        nav {
+            pointer-events: auto;
+            background: rgba(246, 243, 223, 0.7);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            padding: 8px;
+            border-radius: 100px;
+            border: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            box-shadow: 
+                0 8px 32px rgba(65, 70, 42, 0.08);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .nav-scrolled nav {
+            background: rgba(246, 243, 223, 0.9);
+            box-shadow: 
+                0 20px 40px rgba(65, 70, 42, 0.12);
+            padding: 6px;
+        }
+
+        nav:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .logo {
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px 0 16px;
+            border-right: 2px solid var(--accent);
+            margin-right: 4px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+            display: block;
+        }
+
+        .footer-brand .logo {
+            height: 48px;
+            border: none;
+            padding: 0;
+            margin-bottom: 24px;
+            justify-content: flex-start;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            position: relative;
+            padding-right: 4px;
+        }
+
+        .nav-links a {
+            padding: 10px 20px;
+            border-radius: 100px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: capitalize;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hover Highlight / Magnetic Blob */
+        .nav-highlight {
+            position: absolute;
+            background: rgba(158, 167, 107, 0.1);
+            border-radius: 100px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), 
+                        width 0.4s cubic-bezier(0.19, 1, 0.22, 1), 
+                        opacity 0.2s ease;
+        }
+
+        .nav-links:hover .nav-highlight {
+            opacity: 1;
+        }
+
+        .nav-links a:hover {
+            color: var(--fg);
+        }
+
+        .nav-links a.active {
+            color: white;
+        }
+
+        .nav-links a.active ~ .nav-highlight {
+            opacity: 1;
+            background: var(--accent);
+        }
+
+        /* Logic for static active state when not hovering */
+        .nav-links:not(:hover) .nav-highlight.active-state {
+            opacity: 1;
+            background: var(--accent);
+        }
+
+        /* --- Sections --- */
+        section {
+            padding: 120px 0;
+        }
+
+        /* --- Hero --- */
+        .hero {
+            padding: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100svh;
+            min-height: 100svh;
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 14vw, 10rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-transform: lowercase;
+            color: var(--fg);
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* --- Tags --- */
+        .tag {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 6px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+
+        /* --- Projects Grid --- */
+        .section-title-wrap {
+            margin-bottom: 64px;
+            text-align: center;
+        }
+
+        .section-title-wrap h2 {
+            font-size: 4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-image {
+            aspect-ratio: 16 / 10;
+            background-color: var(--surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 3px solid var(--accent);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .project-card:hover .project-image {
+            transform: translateY(-8px) rotate(-1deg);
+            box-shadow: 0 20px 40px rgba(158, 167, 107, 0.2);
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-info h3 {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+
+        .project-info p {
+            color: var(--muted);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* --- Things I Love Section --- */
+        .love-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        @media (max-width: 968px) {
+            .love-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .love-card {
+            background-color: var(--surface);
+            border: 3px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: default;
+            position: relative;
+        }
+
+        .love-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-8px);
+            background-color: var(--bg);
+            box-shadow: 0 24px 48px rgba(158, 167, 107, 0.1);
+        }
+
+        .love-num {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0.3;
+            line-height: 1;
+            transition: all 0.4s ease;
+        }
+
+        .love-icon {
+            color: var(--accent);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 8px;
+        }
+
+        .love-icon svg {
+            width: 72px;
+            height: 72px;
+        }
+
+        .love-card:hover .love-num {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+
+        .love-card:hover .love-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .love-text h3 {
+            font-size: 1.85rem;
+            margin-bottom: 12px;
+            color: var(--fg);
+            line-height: 1.2;
+        }
+
+        .love-text p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        /* --- Skills Stack Section --- */
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 64px;
+        }
+
+        @media (max-width: 968px) {
+            .stack-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stack-card {
+            background-color: var(--surface);
+            border: 4px solid var(--accent);
+            border-radius: var(--radius-lg);
+            padding: 64px 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: default;
+            min-height: 400px;
+        }
+
+        .stack-card:hover {
+            transform: translateY(-12px) rotate(0.5deg);
+            background-color: var(--bg);
+            box-shadow: 0 40px 80px rgba(158, 167, 107, 0.2);
+        }
+
+        .stack-icon {
+            width: 80px;
+            height: 80px;
+            color: var(--accent);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+
+        .stack-card:hover .stack-icon {
+            transform: scale(1.15) rotate(10deg);
+        }
+
+        .stack-info {
+            z-index: 2;
+            margin-top: auto;
+        }
+
+        .stack-info h3 {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            color: var(--fg);
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+
+        .stack-info p {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: var(--muted);
+            font-weight: 600;
+            max-width: 90%;
+        }
+
+        .stack-pattern {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 300px;
+            height: 300px;
+            opacity: 0.08;
+            pointer-events: none;
+            color: var(--accent);
+            z-index: 1;
+            transition: all 0.6s ease;
+        }
+
+        .stack-card:hover .stack-pattern {
+            opacity: 0.15;
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        /* Toolkit Marquee */
+        .toolkit-wrap {
+            background-color: var(--surface);
+            border: 3px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .toolkit-scroll {
+            display: flex;
+            gap: 48px;
+            width: max-content;
+            animation: scroll 30s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .tool-item {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        .tool-item::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        .tool-item:hover {
+            color: var(--accent);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        main section {
+            animation: fadeIn 0.8s ease backwards;
+        }
+
+        /* --- Contact --- */
+        .contact-box {
+            background-color: var(--accent);
+            color: white;
+            padding: 100px 48px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(158, 167, 107, 0.3);
+        }
+
+        .contact-box h2 {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            line-height: 1;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--fg);
+            color: white;
+            padding: 20px 48px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 700;
+            font-family: var(--font-display);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            background-color: var(--accent-hover);
+        }
+
+        footer {
+            background-color: var(--surface);
+            padding: 100px 0 64px;
+            margin-top: 120px;
+            border-top: 3px solid var(--accent);
+        }
+
+        /* --- Modal / Full-Screen Panel --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: var(--bg);
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(100%);
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: fixed;
+            top: 32px;
+            right: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1010;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 24px oklch(0% 0 0 / 0.08);
+        }
+
+        .modal-close:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-content {
+            padding: 100px 0;
+            max-width: var(--container);
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        .modal-image-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .modal-image-grid img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px oklch(0% 0 0 / 0.05);
+        }
+
+        .modal-header {
+            margin-bottom: 48px;
+            text-align: left;
+        }
+
+        .modal-header h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -0.04em;
+        }
+
+        .modal-info {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 64px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-info {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .modal-content {
+                padding: 40px 24px;
+            }
+            .modal-header h2 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .modal-description h4, .modal-meta h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .modal-description p {
+            color: var(--fg);
+            margin-bottom: 24px;
+            font-size: 1.125rem;
+            line-height: 1.6;
+        }
+
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .modal-tag {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* --- New Modal Footer Section --- */
+        .modal-footer-extended {
+            margin-top: 100px;
+            border-top: 1px solid var(--border);
+            padding-top: 80px;
+        }
+
+        .next-project-label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            margin-bottom: 24px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .next-project-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            max-width: 800px;
+            margin: 0 auto 64px;
+            text-align: left;
+        }
+
+        .next-project-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px oklch(0% 0 0 / 0.05);
+        }
+
+        .next-card-content {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .next-card-image {
+            width: 120px;
+            height: 80px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+
+        .next-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .next-card-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+
+        .next-card-info p {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .next-card-arrow {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--fg);
+            transition: all 0.3s ease;
+        }
+
+        .next-project-card:hover .next-card-arrow {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal-footer-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 48px;
+            margin-bottom: 80px;
+        }
+
+        .scroll-top-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .scroll-top-btn:hover {
+            color: var(--accent);
+        }
+
+        .scroll-top-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        .scroll-top-btn:hover svg {
+            transform: translateY(-4px);
+        }
+
+        .modal-footer-bottom-nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 48px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .modal-footer-socials {
+            display: flex;
+            gap: 24px;
+        }
+
+        .modal-footer-socials a {
+            color: var(--fg);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .modal-footer-socials a:hover {
+            color: var(--accent);
+        }
+
+        .modal-footer-legal {
+            text-align: right;
+        }
+
+        .modal-footer-legal-links {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+
+        .modal-footer-legal-links a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .modal-footer-legal-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .next-project-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            .next-card-arrow {
+                align-self: flex-end;
+            }
+            .modal-footer-bottom-nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 32px;
+                text-align: center;
+            }
+            .modal-footer-legal {
+                text-align: center;
+            }
+            .modal-footer-legal-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-outer">
+        <nav id="mainNav" aria-label="Main Navigation" role="navigation">
+            <div class="logo"><img src="mpgitevw-VENOXY-logo..png" alt="Venoxy Logo"></div>
+            <div class="nav-links">
+                <div class="nav-highlight" id="navHighlight"></div>
+                <a href="#projects" aria-label="View Projects">Projects</a>
+                <a href="#love" aria-label="Things I Love">Things I Love</a>
+                <a href="#skills" aria-label="View Skills">Skills</a>
+                <a href="#contact" aria-label="Contact Me">Contact</a>
+            </div>
+        </nav>
+    </div>
+
+    <main>
+        <div class="container">
+            <section class="hero" id="hero">
+                <h1>venoxy arts</h1>
+                <p>Frontend developer</p>
+            </section>
+
+            <section id="projects">
+                <div class="section-title-wrap">
+                    <span class="tag">Selected Works</span>
+                    <h2>Portfolio</h2>
+                </div>
+                
+                <div class="projects-grid">
+                    <div class="project-card" data-project="StreakOn">
+                        <div class="project-image">
+                            <div style="width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--fg); font-weight: 800; font-size: 2rem; font-family: var(--font-display);">StreakOn</div>
+                        </div>
+                        <div class="project-info">
+                            <h3>StreakOn</h3>
+                            <p>Social habit tracking app built with React & Firebase.</p>
+                        </div>
+                    </div>
+
+                    <div class="project-card" data-project="CubeWar">
+                        <div class="project-image">
+                            <div style="width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--fg); font-weight: 800; font-size: 2rem; font-family: var(--font-display);">CubeWar</div>
+                        </div>
+                        <div class="project-info">
+                            <h3>CubeWar</h3>
+                            <p>Multiplayer strategy game with real-time WebSockets.</p>
+                        </div>
+                    </div>
+
+                    <div class="project-card" data-project="Quibbo">
+                        <div class="project-image">
+                            <div style="width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--fg); font-weight: 800; font-size: 2rem; font-family: var(--font-display);">Quibbo</div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Quibbo</h3>
+                            <p>Experimental gaming platform for the modern web.</p>
+                        </div>
+                    </div>
+
+                    <div class="project-card" data-project="Sharkie">
+                        <div class="project-image">
+                            <div style="width: 100%; height: 100%; background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--fg); font-weight: 800; font-size: 2rem; font-family: var(--font-display);">Sharkie</div>
+                        </div>
+                        <div class="project-info">
+                            <h3>Sharkie</h3>
+                            <p>2D adventure game engine with Canvas API.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="love">
+                <div class="section-title-wrap">
+                    <span class="tag">Interests</span>
+                    <h2>Things I Love</h2>
+                </div>
+                
+                <div class="love-grid">
+                    <div class="love-card">
+                        <div class="love-num">01</div>
+                        <div class="love-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        </div>
+                        <div class="love-text">
+                            <h3>FrontEnd & Design</h3>
+                            <p>Creating seamless, beautiful UI/UX with modern web frameworks and clean layout systems.</p>
+                        </div>
+                    </div>
+                    <div class="love-card">
+                        <div class="love-num">02</div>
+                        <div class="love-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="m5 3 1 2"></path><path d="m19 21 1-2"></path><path d="m5 21 1-2"></path><path d="m19 3 1-2"></path></svg>
+                        </div>
+                        <div class="love-text">
+                            <h3>Creative Coding</h3>
+                            <p>Merging code and design to build interactive digital art, game mechanics, and engaging web experiences.</p>
+                        </div>
+                    </div>
+                    <div class="love-card">
+                        <div class="love-num">03</div>
+                        <div class="love-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg>
+                        </div>
+                        <div class="love-text">
+                            <h3>Agentic Dev</h3>
+                            <p>Utilizing autonomous AI workflows to supercharge productivity, streamline backend/frontend logic, and ship robust projects rapidly.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="skills">
+                <div class="section-title-wrap">
+                    <span class="tag">Technical Mastery</span>
+                    <h2>My Core Stack</h2>
+                </div>
+                
+                <div class="stack-grid">
+                    <!-- React -->
+                    <div class="stack-card">
+                        <div class="stack-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M12 21c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9Z"></path><path d="M16.38 8.85a9 9 0 0 1-8.76 6.3"></path><path d="M7.62 8.85a9 9 0 0 0 8.76 6.3"></path></svg>
+                        </div>
+                        <div class="stack-info">
+                            <h3>React</h3>
+                            <p>Architecting scalable, component-driven interfaces with high-fidelity performance and clean state management.</p>
+                        </div>
+                        <svg class="stack-pattern" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="10 5"/></svg>
+                    </div>
+
+                    <!-- Next.js -->
+                    <div class="stack-card">
+                        <div class="stack-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                        </div>
+                        <div class="stack-info">
+                            <h3>Next.js</h3>
+                            <p>Leveraging SSR, ISR, and server actions to deliver lightning-fast, SEO-optimized web experiences.</p>
+                        </div>
+                        <svg class="stack-pattern" viewBox="0 0 100 100" fill="currentColor"><rect x="20" y="20" width="60" height="60" stroke="currentColor" stroke-width="2" fill="none" rx="10"/></svg>
+                    </div>
+
+                    <!-- TypeScript -->
+                    <div class="stack-card">
+                        <div class="stack-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"></path><path d="M8 6l-6 6 6 6"></path></svg>
+                        </div>
+                        <div class="stack-info">
+                            <h3>TypeScript</h3>
+                            <p>Ensuring robust, type-safe development workflows that minimize regressions and enhance developer experience.</p>
+                        </div>
+                        <svg class="stack-pattern" viewBox="0 0 100 100" fill="currentColor"><path d="M20 20 L80 80 M80 20 L20 80" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                    </div>
+
+                    <!-- Framer -->
+                    <div class="stack-card">
+                        <div class="stack-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14l-7 7-7-7zM5 10h14l-7 7-7-7zM5 17h7l7 7H5v-7z"/></svg>
+                        </div>
+                        <div class="stack-info">
+                            <h3>Framer</h3>
+                            <p>Bringing designs to life with fluid, orchestrated animations and high-fidelity micro-interactions.</p>
+                        </div>
+                        <svg class="stack-pattern" viewBox="0 0 100 100" fill="currentColor"><path d="M10 50 Q 50 10 90 50 T 10 50" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                    </div>
+                </div>
+
+                <div class="toolkit-wrap">
+                    <div class="toolkit-scroll">
+                        <div class="tool-item">Node.js</div>
+                        <div class="tool-item">Tailwind CSS</div>
+                        <div class="tool-item">GSAP</div>
+                        <div class="tool-item">Three.js</div>
+                        <div class="tool-item">Figma</div>
+                        <div class="tool-item">Git / GitHub</div>
+                        <div class="tool-item">Vercel</div>
+                        <div class="tool-item">Firebase</div>
+                        <div class="tool-item">PostgreSQL</div>
+                        <!-- Duplicate for infinite scroll -->
+                        <div class="tool-item">Node.js</div>
+                        <div class="tool-item">Tailwind CSS</div>
+                        <div class="tool-item">GSAP</div>
+                        <div class="tool-item">Three.js</div>
+                        <div class="tool-item">Figma</div>
+                        <div class="tool-item">Git / GitHub</div>
+                        <div class="tool-item">Vercel</div>
+                        <div class="tool-item">Firebase</div>
+                        <div class="tool-item">PostgreSQL</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact">
+                <div class="contact-box">
+                    <span class="tag" style="background: var(--accent); color: white; margin-bottom: 24px;">Collaboration</span>
+                    <h2>Ready to build something unique?</h2>
+                    <p style="margin-bottom: 40px; opacity: 0.8; font-size: 1.1rem; max-width: 500px; margin-inline: auto;">Currently accepting freelance projects and collaborations with design-forward agencies and startups.</p>
+                    <a href="mailto:hello@example.com" class="btn">Get in touch</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer style="padding-top: 100px; padding-bottom: 64px;">
+        <div class="container">
+            <div style="border-top: 1px solid var(--border); padding-top: 80px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 64px;">
+                <div class="footer-brand">
+                    <div class="logo"><img src="mpgitevw-VENOXY-logo..png" alt="Venoxy Logo"></div>
+                    <p style="color: var(--muted); max-width: 320px; font-size: 1rem; line-height: 1.6;">
+                        Independent Web Developer crafting high-fidelity digital experiences for forward-thinking agencies and products.
+                    </p>
+                </div>
+                
+                <div class="footer-nav">
+                    <h4 style="font-family: var(--font-display); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px;">Sitemap</h4>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: 12px;"><a href="#" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Home</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#projects" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Projects</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#love" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Things I Love</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#skills" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Skills</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#contact" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social">
+                    <h4 style="font-family: var(--font-display); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px;">Connect</h4>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: 12px;"><a href="#" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Twitter</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">LinkedIn</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">GitHub</a></li>
+                        <li style="margin-bottom: 12px;"><a href="#" style="text-decoration: none; color: var(--fg); font-weight: 600; font-size: 0.95rem;">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.875rem;">
+                <p>&copy; 2026 Venoxy. All rights reserved.</p>
+                <p>Designed and Developed with precision.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Project Detail Modal -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal-container">
+            <button class="modal-close" id="closeModal" aria-label="Close Modal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="modal-content" id="modalContent">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Dynamic Navigation Logic ---
+        const navHighlight = document.getElementById('navHighlight');
+        const navLinksList = document.querySelectorAll('.nav-links a');
+        const navLinksContainer = document.querySelector('.nav-links');
+        const sections = document.querySelectorAll('section[id]');
+
+        function updateHighlight(target) {
+            const rect = target.getBoundingClientRect();
+            const parentRect = navLinksContainer.getBoundingClientRect();
+            navHighlight.style.width = `${rect.width}px`;
+            navHighlight.style.transform = `translateX(${rect.left - parentRect.left}px)`;
+        }
+
+        // Hover Effect
+        navLinksList.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                updateHighlight(link);
+            });
+        });
+
+        navLinksContainer.addEventListener('mouseleave', () => {
+            // Return to active section when not hovering
+            const activeLink = document.querySelector('.nav-links a.active');
+            if (activeLink) {
+                updateHighlight(activeLink);
+            }
+        });
+
+        // Scroll Tracking
+        window.addEventListener('scroll', () => {
+            let current = '';
+            const scrollPos = window.scrollY + 150;
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinksList.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                    if (!navLinksContainer.matches(':hover')) {
+                        updateHighlight(link);
+                        navHighlight.classList.add('active-state');
+                    }
+                } else if (current === '') {
+                    // Hero section or top of page
+                    navHighlight.classList.remove('active-state');
+                }
+            });
+
+            // Nav transformation on scroll
+            if (window.scrollY > 50) {
+                document.body.classList.add('nav-scrolled');
+            } else {
+                document.body.classList.remove('nav-scrolled');
+            }
+        });
+
+        // Initial state
+        window.dispatchEvent(new Event('scroll'));
+
+        const projectsData = {
+            'StreakOn': {
+                title: 'StreakOn',
+                description: 'A high-performance habit tracking social network designed for power users.',
+                longDescription: 'The application focuses on the psychology of consistency. Users can join "tribes" to compete in habit challenges, view detailed progress analytics, and receive AI-driven insights on their behavior patterns. Built with a mobile-first approach, it provides a seamless experience for tracking daily wins on the go.',
+                images: ['mpfomonk-image.png', 'mpfod710-image.png', 'mpfo17lf-image.png'],
+                tags: ['React', 'Firebase', 'Tailwind CSS', 'Framer Motion'],
+                role: 'Lead Frontend Developer',
+                year: '2025',
+                link: '#'
+            },
+            'CubeWar': {
+                title: 'CubeWar',
+                description: 'An experimental multiplayer strategy game using WebSockets and canvas rendering.',
+                longDescription: 'CubeWar features a custom spatial partitioning system for collision detection and a binary-packed WebSocket protocol for minimal latency. The game supports up to 100 players in a single arena with thousands of persistent units, pushing the limits of browser performance.',
+                images: ['mpfo17lf-image.png', 'mpfod710-image.png'],
+                tags: ['JavaScript', 'Socket.io', 'Canvas API', 'Node.js'],
+                role: 'Full Stack Engineer',
+                year: '2024',
+                link: '#'
+            },
+            'Quibbo': {
+                title: 'Quibbo',
+                description: 'A modern gaming platform providing a curated collection of web-native experiences.',
+                longDescription: 'Quibbo includes a proprietary SDK for game developers to integrate social features like cloud saves and friend lists. The platform uses edge-caching to ensure sub-second load times and a seamless discovery experience for indie web games.',
+                images: ['mpfod710-image.png'],
+                tags: ['Next.js', 'PostgreSQL', 'Redis', 'AWS'],
+                role: 'Frontend Architect',
+                year: '2025',
+                link: '#'
+            },
+            'Sharkie': {
+                title: 'Sharkie',
+                description: 'A 2D adventure game engine built to showcase the power of the Canvas API.',
+                longDescription: 'Sharkie is a passion project focused on game feel and procedural level design. The engine includes a custom physics solver, light-mapping system, and an entity-component-system (ECS) architecture. Each playthrough generates a unique world based on a seed.',
+                images: ['mpfo17lf-image.png'],
+                tags: ['TypeScript', 'Canvas', 'GLSL', 'Vite'],
+                role: 'Solo Developer',
+                year: '2023',
+                link: '#'
+            }
+        };
+
+        const modal = document.getElementById('projectModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const projectCards = document.querySelectorAll('.project-card');
+
+        function openProject(projectId) {
+            const data = projectsData[projectId];
+            if (!data) return;
+
+            // Find next project
+            const projectIds = Object.keys(projectsData);
+            const currentIndex = projectIds.indexOf(projectId);
+            const nextIndex = (currentIndex + 1) % projectIds.length;
+            const nextProjectId = projectIds[nextIndex];
+            const nextProjectData = projectsData[nextProjectId];
+
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <span class="tag">${data.year}</span>
+                    <h2>${data.title}</h2>
+                    <p style="color: var(--muted); font-size: 1.25rem; max-width: 800px;">${data.description}</p>
+                </div>
+                
+                <div class="modal-info" style="margin-bottom: 64px;">
+                    <div class="modal-description">
+                        <h4>Overview</h4>
+                        <p>${data.longDescription}</p>
+                        <a href="${data.link}" class="btn" target="_blank" rel="noopener noreferrer" style="margin-top: 24px;">
+                            View Live App
+                            <svg style="margin-left: 8px; vertical-align: middle;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                    </div>
+                    <div class="modal-meta">
+                        <h4>Role</h4>
+                        <p style="margin-bottom: 24px; font-weight: 600;">${data.role}</p>
+                        <h4>Technologies</h4>
+                        <div class="modal-tags">
+                            ${data.tags.map(tag => `<span class="modal-tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-image-grid">
+                    ${data.images.map(img => `<img src="${img}" alt="${data.title} screenshot" loading="lazy">`).join('')}
+                </div>
+
+                <div class="modal-footer-extended">
+                    <span class="next-project-label">Next Project</span>
+                    <div class="next-project-card" id="nextProjectBtn">
+                        <div class="next-card-content">
+                            <div class="next-card-image">
+                                <img src="${nextProjectData.images[0]}" alt="${nextProjectData.title}">
+                            </div>
+                            <div class="next-card-info">
+                                <h3>${nextProjectData.title}</h3>
+                                <p>${nextProjectData.description}</p>
+                            </div>
+                        </div>
+                        <div class="next-card-arrow">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button class="scroll-top-btn" id="modalScrollTop">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            <span>Back to Top</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-footer-bottom-nav">
+                        <div class="modal-footer-socials">
+                            <a href="#">Twitter</a>
+                            <a href="#">LinkedIn</a>
+                            <a href="#">GitHub</a>
+                            <a href="#">Instagram</a>
+                        </div>
+                        <div class="modal-footer-legal">
+                            <p>&copy; 2026 Venoxy.</p>
+                            <div class="modal-footer-legal-links">
+                                <a href="#">Privacy Policy</a>
+                                <a href="#">Legal Notice</a>
+                                <a href="#">Cookies</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Handle Scroll to Top
+            document.getElementById('modalScrollTop').addEventListener('click', () => {
+                modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Re-attach listener for next project button
+            const nextBtn = document.getElementById('nextProjectBtn');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    modalContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => {
+                        openProject(nextProjectId);
+                    }, 300);
+                });
+            }
+
+            // Ensure modal scrolls to top when switching projects
+            modalContainer.scrollTo({ top: 0, behavior: 'instant' });
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        const modalContainer = document.querySelector('.modal-container');
+
+        projectCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                const projectId = card.getAttribute('data-project');
+                openProject(projectId);
+            });
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>

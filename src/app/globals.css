@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-matcha: var(--theme-matcha);
+  --color-matcha-hover: var(--theme-matcha-hover);
+  --color-milky: var(--theme-milky);
+  --color-milky-surface: var(--theme-milky-surface);
+  --color-olive-primary: var(--theme-olive-primary);
+  --color-olive-secondary: var(--theme-olive-secondary);
+  
+  --font-sans: var(--font-fredoka), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-fredoka), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  --radius-lg: 40px;
+  --radius-md: 20px;
+  --radius-sm: 10px;
+  
+  --animate-scroll: scroll 30s linear infinite;
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+@layer base {
+  :root {
+    --theme-matcha: #9EA76B;
+    --theme-matcha-hover: #858D5A;
+    --theme-milky: #EFE8CA;
+    --theme-milky-surface: #F6F3DF;
+    --theme-olive-primary: #41462A;
+    --theme-olive-secondary: #7A8155;
+  }
+
+  :root.dark {
+    --theme-matcha: #A9B17D;
+    --theme-matcha-hover: #C1C996;
+    --theme-milky: #1A1C14;
+    --theme-milky-surface: #25281D;
+    --theme-olive-primary: #F6F3DF;
+    --theme-olive-secondary: #A2AA7B;
+  }
+}
+
+/* Custom Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--theme-milky);
+  color: var(--theme-olive-primary);
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--theme-matcha);
+  color: var(--theme-milky-surface);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #EFE8CA;
+}
+::-webkit-scrollbar-thumb {
+  background: #9EA76B;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #858D5A;
+}
+
+/* Lenis smooth scrolling support */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Hide Navbar when modal is open */
+.modal-open .fixed.top-6.z-40 {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-20px) !important;
+}
