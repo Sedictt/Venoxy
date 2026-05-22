@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, Variants } from "framer-motion";
-import { Monitor, Sparkles, Cpu } from "lucide-react";
+import { Monitor, Sparkles, Cpu, ArrowRight, Camera } from "lucide-react";
+import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
 
 interface LoveCard {
   num: string;
@@ -107,6 +108,25 @@ export default function Love() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Gallery Redirect (Accompany with a premium, engaging icon and elegant visual structure) */}
+        <div className="flex justify-center mt-20">
+          <Link
+            href="/gallery"
+            className="inline-flex flex-col sm:flex-row items-center gap-3.5 px-6 sm:px-8 py-4 sm:py-5 border-2 border-matcha/20 hover:border-matcha bg-milky-surface/40 hover:bg-milky-surface/80 backdrop-blur-md rounded-2xl sm:rounded-full text-olive-primary hover:text-matcha font-bold text-xs sm:text-sm uppercase tracking-widest transition-all duration-500 hover:scale-[1.02] hover:-translate-y-0.5 shadow-sm hover:shadow-[0_16px_32px_rgba(158,167,107,0.08)] group cursor-pointer text-center max-w-full"
+          >
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-matcha/10 text-matcha group-hover:bg-matcha group-hover:text-milky-surface transition-all duration-500 shrink-0">
+              <Camera className="w-4.5 h-4.5" />
+            </span>
+            <span className="font-semibold text-olive-secondary group-hover:text-olive-primary transition-colors duration-300 leading-normal">
+              Looking for my photography & design gallery?
+            </span>
+            <span className="font-extrabold text-matcha underline underline-offset-4 decoration-2 decoration-matcha/30 group-hover:decoration-matcha transition-colors duration-300 shrink-0 leading-normal">
+              Explore my Creative Archive
+            </span>
+            <ArrowRight className="w-4 h-4 text-matcha transition-transform duration-300 group-hover:translate-x-1.5 shrink-0" />
+          </Link>
         </div>
       </div>
     </section>

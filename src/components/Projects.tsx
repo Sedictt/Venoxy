@@ -14,11 +14,16 @@ interface Project {
   tags: string[];
   link: string;
   color: string;
-  icon: React.ReactNode;
+  thumbnail: string;
   images: string[];
 }
 
-export default function Projects() {
+interface ProjectsProps {
+  initialProjects?: Project[];
+}
+
+export default function Projects({ initialProjects = [] }: ProjectsProps) {
+  const projects = initialProjects;
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [galleryPage, setGalleryPage] = useState(1);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
@@ -66,41 +71,6 @@ export default function Projects() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxImageIndex, selectedProject]);
-
-  const projects: Project[] = [
-    {
-      id: "Librowse",
-      title: "Librowse",
-      description: "A comprehensive digital library and book management system.",
-      longDescription: "Librowse is a robust library management platform that facilitates book tracking, daily check-ins, user monitoring, and request handling. It features a complete suite of tools for users to manage their books, chat with others, and keep track of their reviews and notifications, providing a seamless library experience.",
-      role: "Full Stack Developer",
-      year: "2024",
-      tags: ["React", "TypeScript", "Tailwind CSS", "Next.js"],
-      link: "#",
-      color: "#9EA76B",
-      icon: (
-        <img src="/Projects/librowse/main.png" alt="Librowse Project" className="w-full h-full object-cover object-top" />
-      ),
-      images: [
-        "/Projects/librowse/main.png",
-        "/Projects/librowse/Librowse_Home_Page.png",
-        "/Projects/librowse/Librowse_Books_Page.png",
-        "/Projects/librowse/Librowse_Chats_Page.png",
-        "/Projects/librowse/Librowse_Chat_Modal.png",
-        "/Projects/librowse/Librowse_My_Books_Tab.png",
-        "/Projects/librowse/Librowse_Reviews_Tab.png",
-        "/Projects/librowse/Librowse_Request_Page.png",
-        "/Projects/librowse/Librowse_Monitoring_Page.png",
-        "/Projects/librowse/Librowse_Daily_Check-in_Modal.png",
-        "/Projects/librowse/Librowse_Notification_Modal.png",
-        "/Projects/librowse/Librowse_Profile_Page.png",
-        "/Projects/librowse/Librowse_Verification_Tab.png",
-        "/Projects/librowse/Librowse_Violations_Tab.png",
-        "/Projects/librowse/Librowse_Settings_Tab.png",
-        "/Projects/librowse/Librowse_Modal.png"
-      ]
-    }
-  ];
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>, src: string) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -185,7 +155,7 @@ export default function Projects() {
             >
               {/* Project Card Image Display */}
               <div className="aspect-[16/10] w-full rounded-[40px] overflow-hidden border-[3px] border-matcha bg-milky-surface relative shadow-sm group-hover:shadow-[0_20px_40px_rgba(158,167,107,0.25)] group-hover:rotate-[-1deg] transition-all duration-500">
-                {project.icon}
+                <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover object-top" />
                 <div className="absolute inset-0 bg-matcha/0 group-hover:bg-matcha/5 transition-colors duration-500" />
               </div>
 
@@ -311,7 +281,7 @@ export default function Projects() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
               >
-                {selectedProject.icon}
+                <img src={selectedProject.thumbnail} alt={selectedProject.title} className="w-full h-full object-cover object-top" />
                 <div className="absolute inset-0 bg-matcha/5 opacity-0 group-hover/hero:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="w-12 h-12 rounded-full bg-milky-surface/90 backdrop-blur-sm border border-matcha/30 flex items-center justify-center text-olive-primary shadow-md transform scale-90 group-hover/hero:scale-100 transition-all duration-300">
                     <Maximize2 className="w-5 h-5" />
@@ -358,9 +328,7 @@ export default function Projects() {
                         >
                           {/* Card Graphic Container */}
                           <div 
-                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${
-                              isLong ? "h-[380px]" : "aspect-[16/10]"
-                            }`}
+                            className="w-full aspect-[16/10] rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative"
                           >
                             <img
                               src={src}
@@ -374,8 +342,8 @@ export default function Projects() {
                             {/* Bottom Truncation Gradient Overlay & Action Badge */}
                             {isLong && (
                               <>
-                                <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-milky-surface via-milky-surface/85 to-transparent pointer-events-none z-10 transition-colors duration-300" />
-                                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-milky-surface/90 backdrop-blur-md border border-matcha/30 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold text-olive-primary uppercase tracking-widest shadow-md pointer-events-none group-hover/card:scale-105 group-hover/card:bg-matcha group-hover/card:text-milky-surface group-hover/card:border-matcha transition-all duration-300 z-20">
+                                <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-milky-surface via-milky-surface/85 to-transparent pointer-events-none z-10 transition-colors duration-300" />
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-milky-surface/90 backdrop-blur-md border border-matcha/30 px-3.5 py-1.5 rounded-full flex items-center gap-1.5 text-[10px] font-bold text-olive-primary uppercase tracking-widest shadow-md pointer-events-none group-hover/card:scale-105 group-hover/card:bg-matcha group-hover/card:text-milky-surface group-hover/card:border-matcha transition-all duration-300 z-20">
                                   <Maximize2 className="w-3 h-3" />
                                   <span>View Full Screen</span>
                                 </div>
@@ -469,7 +437,11 @@ export default function Projects() {
                 >
                   <div className="flex items-center gap-6">
                     <div className="w-20 h-14 rounded-md overflow-hidden bg-milky flex-shrink-0 border border-matcha/10">
-                      {projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].icon}
+                      <img 
+                        src={projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].thumbnail} 
+                        alt="Next Project Thumbnail" 
+                        className="w-full h-full object-cover object-top" 
+                      />
                     </div>
                     <div>
                       <h3 className="font-display font-bold text-lg text-olive-primary">

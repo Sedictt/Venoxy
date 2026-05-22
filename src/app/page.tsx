@@ -7,8 +7,11 @@ import Love from "@/components/Love";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import { getDynamicProjects } from "@/lib/projects";
 
 export default function Home() {
+  const dynamicProjects = getDynamicProjects();
+
   return (
     <SmoothScroll>
       {/* Custom Mouse Cursor element */}
@@ -22,7 +25,7 @@ export default function Home() {
         <Hero />
         <Love />
         <Skills />
-        <Projects />
+        <Projects initialProjects={dynamicProjects} />
         <Contact />
       </main>
 

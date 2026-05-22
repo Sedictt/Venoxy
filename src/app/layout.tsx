@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka } from "next/font/google";
 import "./globals.css";
+import { PageTransitionProvider } from "@/components/transitions/PageTransitionProvider";
 
 const fredoka = Fredoka({
   variable: "--font-fredoka",
@@ -44,7 +45,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <PageTransitionProvider>
+            {children}
+          </PageTransitionProvider>
         </ThemeProvider>
       </body>
     </html>

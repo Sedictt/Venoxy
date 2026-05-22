@@ -1,0 +1,1 @@
+Librowse is a premium side project designed to showcase high-fidelity interfaces and interactive user flows. It features real-time chat modals, beautiful reviews, detailed books lists, administrative monitoring dashboards, and seamless profile/settings controls. The project implements modern styling and transitions to deliver a gorgeous desktop and mobile experience.

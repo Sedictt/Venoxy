@@ -46,39 +46,22 @@ export default function Hero() {
       id="hero"
       className="relative flex flex-col items-center justify-center min-h-[100vh] w-full text-center overflow-hidden px-6"
     >
-      {/* Background Graphic Elements */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {/* Soft floating blob 1 */}
-        <motion.div
-          className="absolute w-[35vw] h-[35vw] max-w-[400px] rounded-full bg-matcha/10 blur-[80px]"
-          animate={{
-            x: [0, 40, -20, 0],
-            y: [0, -30, 20, 0],
-            scale: [1, 1.1, 0.95, 1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          style={{ top: "15%", left: "15%" }}
-        />
-        {/* Soft floating blob 2 */}
-        <motion.div
-          className="absolute w-[40vw] h-[40vw] max-w-[450px] rounded-full bg-matcha/5 blur-[100px]"
-          animate={{
-            x: [0, -50, 30, 0],
-            y: [0, 40, -30, 0],
-            scale: [1, 0.9, 1.1, 1],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          style={{ bottom: "10%", right: "10%" }}
-        />
+      {/* Background Relaxing Wave Elements */}
+      <div className="absolute inset-0 pointer-events-none z-0 flex flex-col justify-stretch overflow-hidden opacity-70 dark:opacity-35">
+        <div className="wave-row wave-delay-1" />
+        <div className="wave-row wave-delay-2" />
+        <div className="wave-row wave-delay-3" />
+        <div className="wave-row wave-delay-4" />
+        <div className="wave-row wave-delay-5" />
+        <div className="wave-row wave-delay-6" />
+        <div className="wave-row wave-delay-7" />
+        <div className="wave-row wave-delay-8" />
+        <div className="wave-row wave-delay-9" />
+        <div className="wave-row wave-delay-10" />
       </div>
+
+      {/* Wave bottom blending mask */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-milky/20 to-milky z-0 pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center select-none">
         {/* Animated Main Title */}
