@@ -62,6 +62,30 @@ const SkillNode = ({ skill, scrollYProgress }: { skill: SkillData, scrollYProgre
   );
 };
 
+// Array of base skills with their absolute positions and parallax speeds
+const baseSkillsData = [
+  { id: "typescript_text", type: "text", content: "TypeScript", top: "15%", left: "15%", speed: -0.6, scale: 1.3 },
+  { id: "nextjs_text", type: "text", content: "Next.js", top: "25%", left: "40%", speed: -0.2, scale: 0.9 },
+  { id: "gsap", type: "text", content: "GSAP", top: "45%", left: "10%", speed: 0.4, scale: 0.8 },
+  { id: "framer_text", type: "text", content: "Framer", top: "35%", left: "28%", speed: -0.1, scale: 0.7 },
+  
+  // Image nodes (User will provide these in public/skills)
+  { id: "react", type: "image", src: "/skills/react.png", top: "50%", left: "55%", speed: 0.2, scale: 1.5 },
+  { id: "nextjs", type: "image", src: "/skills/nextjs.png", top: "20%", left: "80%", speed: -0.8, scale: 1.4 },
+  { id: "typescript", type: "image", src: "/skills/typescript.png", top: "55%", left: "75%", speed: -0.4, scale: 1.3 },
+  { id: "framer", type: "image", src: "/skills/framer.png", top: "45%", left: "25%", speed: 0.5, scale: 1.4 },
+  
+  { id: "motiondev", type: "text", content: "Motion.dev", top: "75%", left: "20%", speed: -0.3, scale: 0.9 },
+  { id: "tailwind", type: "text", content: "Tailwind", top: "70%", left: "60%", speed: 0.3, scale: 0.8 },
+];
+
+// Pre-calculate random values outside of render to keep components pure
+const skillsData = baseSkillsData.map(skill => ({
+  ...skill,
+  floatDuration: 4 + (Math.random() * 3),
+  floatDelay: Math.random() * 2,
+}));
+
 export default function Skills() {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -71,23 +95,6 @@ export default function Skills() {
     offset: ["start end", "end start"]
   });
 
-  // Array of skills with their absolute positions and parallax speeds
-  const skillsData = [
-    { id: "typescript_text", type: "text", content: "TypeScript", top: "15%", left: "15%", speed: -0.6, scale: 1.3 },
-    { id: "nextjs_text", type: "text", content: "Next.js", top: "25%", left: "40%", speed: -0.2, scale: 0.9 },
-    { id: "gsap", type: "text", content: "GSAP", top: "45%", left: "10%", speed: 0.4, scale: 0.8 },
-    { id: "framer_text", type: "text", content: "Framer", top: "35%", left: "28%", speed: -0.1, scale: 0.7 },
-    
-    // Image nodes (User will provide these in public/skills)
-    { id: "react", type: "image", src: "/skills/react.png", top: "50%", left: "55%", speed: 0.2, scale: 1.5 },
-    { id: "nextjs", type: "image", src: "/skills/nextjs.png", top: "20%", left: "80%", speed: -0.8, scale: 1.4 },
-    { id: "typescript", type: "image", src: "/skills/typescript.png", top: "55%", left: "75%", speed: -0.4, scale: 1.3 },
-    { id: "framer", type: "image", src: "/skills/framer.png", top: "45%", left: "25%", speed: 0.5, scale: 1.4 },
-    
-    { id: "motiondev", type: "text", content: "Motion.dev", top: "75%", left: "20%", speed: -0.3, scale: 0.9 },
-    { id: "tailwind", type: "text", content: "Tailwind", top: "70%", left: "60%", speed: 0.3, scale: 0.8 },
-  ];
-
   return (
     <section 
       id="skills" 
@@ -95,7 +102,7 @@ export default function Skills() {
       className="relative w-full h-[120vh] min-h-[800px] bg-milky transition-colors duration-500"
     >
       {/* Background/Foreground Scattered Nodes */}
-      {skillsDataWithMotion.map((skill) => (
+      {skillsData.map((skill) => (
         <SkillNode key={skill.id} skill={skill} scrollYProgress={scrollYProgress} />
       ))}
 

@@ -20,8 +20,8 @@ export default function Love() {
     },
     {
       num: "02",
-      title: "Creative Coding",
-      description: "Merging code and design to build interactive digital art, game mechanics, and engaging web experiences.",
+      title: "Side Projects",
+      description: "Building diverse mini-projects to explore different styles, venture into new fields, and continuously enhance my skills and knowledge.",
       icon: <Sparkles className="w-16 h-16" />
     },
     {

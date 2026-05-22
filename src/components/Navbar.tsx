@@ -5,9 +5,8 @@ import { motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeToggle";
 
 const navLinks = [
-  { id: "projects", label: "Projects" },
-  { id: "love", label: "Things I Love" },
-  { id: "skills", label: "Skills" },
+  { id: "hero", label: "About" },
+  { id: "projects", label: "Project" },
   { id: "contact", label: "Contact" }
 ];
 

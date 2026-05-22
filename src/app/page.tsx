@@ -20,9 +20,9 @@ export default function Home() {
       {/* Semantic Main Content Grid */}
       <main className="flex-grow w-full flex flex-col items-center relative z-10">
         <Hero />
-        <Projects />
         <Love />
         <Skills />
+        <Projects />
         <Contact />
       </main>
 
