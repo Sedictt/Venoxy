@@ -304,13 +304,19 @@ export default function Projects() {
 
               {/* Showcase Graphic */}
               <motion.div 
-                className="w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface"
+                onClick={() => setLightboxImageIndex(0)}
+                className="w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
               >
                 {selectedProject.icon}
+                <div className="absolute inset-0 bg-matcha/5 opacity-0 group-hover/hero:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-milky-surface/90 backdrop-blur-sm border border-matcha/30 flex items-center justify-center text-olive-primary shadow-md transform scale-90 group-hover/hero:scale-100 transition-all duration-300">
+                    <Maximize2 className="w-5 h-5" />
+                  </div>
+                </div>
               </motion.div>
 
               {/* Screenshots Gallery Section */}
