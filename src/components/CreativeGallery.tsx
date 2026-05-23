@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ChevronLeft, ChevronRight, X, Maximize2 } from "lucide-react";
 import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
+import Masonry from "./Masonry";
 
 interface CreativeItem {
   id: string;
   src: string;
   title: string;
-  category: "photography" | "design";
+  category: "photography" | "design" | "traditional" | "digital";
   description: string;
   details: string;
 }
@@ -19,22 +20,43 @@ interface CreativeGalleryProps {
 }
 
 export default function CreativeGallery({ initialItems = [] }: CreativeGalleryProps) {
-  const [activeTab, setActiveTab] = useState<"all" | "photography" | "design">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "photography" | "design" | "traditional" | "digital">("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [shuffledItems, setShuffledItems] = useState<CreativeItem[]>([]);
+
+  // Shuffle items once on mount (client-side only to prevent SSR hydration mismatch)
+  useEffect(() => {
+    let active = true;
+    const shuffle = (array: CreativeItem[]) => {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
+    Promise.resolve().then(() => {
+      if (active) {
+        setShuffledItems(shuffle(initialItems));
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [initialItems]);
+
+  // Use shuffled items if ready on the client, falling back to initialItems for hydration safety
+  const baseItems = shuffledItems.length > 0 ? shuffledItems : initialItems;
 
   // Filter items based on active category tab
-  const filteredItems = initialItems.filter(item => {
+  const filteredItems = baseItems.filter(item => {
     if (activeTab === "all") return true;
     return item.category === activeTab;
   });
 
-  // Balance columns stably using global indices to prevent items from jumping columns during filtering transitions
-  const leftColItems = filteredItems.filter(
-    item => initialItems.findIndex(i => i.id === item.id) % 2 === 0
-  );
-  const rightColItems = filteredItems.filter(
-    item => initialItems.findIndex(i => i.id === item.id) % 2 !== 0
-  );
+  // Sizing and column balancing is handled dynamically inside the preloading GSAP Masonry component
 
   // Lock body scroll when lightbox modal is open
   useEffect(() => {
@@ -71,10 +93,12 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxIndex, filteredItems]);
 
-  const tabs: { id: "all" | "photography" | "design"; label: string }[] = [
+  const tabs: { id: "all" | "photography" | "design" | "traditional" | "digital"; label: string }[] = [
     { id: "all", label: "All Works" },
     { id: "photography", label: "Photography" },
-    { id: "design", label: "Graphic Design" }
+    { id: "design", label: "Graphic Design" },
+    { id: "traditional", label: "Traditional Art" },
+    { id: "digital", label: "Digital Art" }
   ];
 
   return (
@@ -133,7 +157,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
           </div>
         </div>
 
-        {/* Dynamic Masonry Columns Grid */}
+        {/* Dynamic Masonry Grid from React Bits powered by GSAP */}
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="w-16 h-16 rounded-full border border-matcha/30 flex items-center justify-center text-olive-secondary mb-4">
@@ -147,117 +171,27 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
             </p>
           </div>
         ) : (
-          <LayoutGroup id="creative-gallery">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 items-start w-full">
-              {/* Left Column Stack */}
-              <div className="flex flex-col gap-8 w-full relative">
-                <AnimatePresence mode="popLayout">
-                  {leftColItems.map((item) => {
-                    const originalIndex = filteredItems.findIndex(i => i.id === item.id);
-                    return (
-                      <motion.div
-                        layout
-                        key={item.id}
-                        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96, y: -20 }}
-                        whileHover={{ y: -8 }}
-                        transition={{
-                          opacity: { duration: 0.25 },
-                          scale: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
-                          y: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
-                          layout: { type: "tween", ease: [0.25, 1, 0.5, 1], duration: 0.4 }
-                        }}
-                        onClick={() => setLightboxIndex(originalIndex)}
-                        className="w-full rounded-[32px] overflow-hidden border-[3px] border-matcha bg-milky-surface relative cursor-pointer group shadow-sm hover:shadow-[0_20px_40px_rgba(158,167,107,0.25)] transition-shadow duration-300"
-                      >
-                        {/* Visual Asset */}
-                        <img 
-                          src={item.src} 
-                          alt={item.title} 
-                          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                        />
-
-                        {/* Dark Glass Overlay & Meta */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8 text-white">
-                          <span className="inline-block bg-matcha text-milky-surface text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm mb-2 self-start">
-                            {item.category === "photography" ? "Photography" : "Design"}
-                          </span>
-                          <div className="flex justify-between items-end">
-                            <div>
-                              <h3 className="font-display font-bold text-xl tracking-tight leading-snug">
-                                {item.title}
-                              </h3>
-                              <p className="text-white/60 text-xs font-semibold mt-1">
-                                {item.details}
-                              </p>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-milky-surface/90 backdrop-blur-sm border border-matcha/30 flex items-center justify-center text-olive-primary shadow-md transform scale-90 group-hover:scale-100 transition-all duration-300">
-                              <Maximize2 className="w-4 h-4 text-matcha" />
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-
-              {/* Right Column Stack */}
-              <div className="flex flex-col gap-8 w-full relative">
-                <AnimatePresence mode="popLayout">
-                  {rightColItems.map((item) => {
-                    const originalIndex = filteredItems.findIndex(i => i.id === item.id);
-                    return (
-                      <motion.div
-                        layout
-                        key={item.id}
-                        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.96, y: -20 }}
-                        whileHover={{ y: -8 }}
-                        transition={{
-                          opacity: { duration: 0.25 },
-                          scale: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
-                          y: { duration: 0.35, ease: [0.25, 1, 0.5, 1] },
-                          layout: { type: "tween", ease: [0.25, 1, 0.5, 1], duration: 0.4 }
-                        }}
-                        onClick={() => setLightboxIndex(originalIndex)}
-                        className="w-full rounded-[32px] overflow-hidden border-[3px] border-matcha bg-milky-surface relative cursor-pointer group shadow-sm hover:shadow-[0_20px_40px_rgba(158,167,107,0.25)] transition-shadow duration-300"
-                      >
-                        {/* Visual Asset */}
-                        <img 
-                          src={item.src} 
-                          alt={item.title} 
-                          className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                        />
-
-                        {/* Dark Glass Overlay & Meta */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8 text-white">
-                          <span className="inline-block bg-matcha text-milky-surface text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm mb-2 self-start">
-                            {item.category === "photography" ? "Photography" : "Design"}
-                          </span>
-                          <div className="flex justify-between items-end">
-                            <div>
-                              <h3 className="font-display font-bold text-xl tracking-tight leading-snug">
-                                {item.title}
-                              </h3>
-                              <p className="text-white/60 text-xs font-semibold mt-1">
-                                {item.details}
-                              </p>
-                            </div>
-                            <div className="w-10 h-10 rounded-full bg-milky-surface/90 backdrop-blur-sm border border-matcha/30 flex items-center justify-center text-olive-primary shadow-md transform scale-90 group-hover:scale-100 transition-all duration-300">
-                              <Maximize2 className="w-4 h-4 text-matcha" />
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-              </div>
-            </div>
-          </LayoutGroup>
+          <div className="w-full">
+            <Masonry
+              items={filteredItems.map((item, idx) => ({
+                id: item.id,
+                img: item.src,
+                title: item.title,
+                category: item.category,
+                details: item.details,
+                originalIndex: idx
+              }))}
+              ease="power3.out"
+              duration={0.6}
+              stagger={0.05}
+              animateFrom="bottom"
+              scaleOnHover={true}
+              hoverScale={0.95}
+              blurToFocus={true}
+              colorShiftOnHover={false}
+              onItemClick={(item) => setLightboxIndex(item.originalIndex ?? null)}
+            />
+          </div>
         )}
       </div>
 

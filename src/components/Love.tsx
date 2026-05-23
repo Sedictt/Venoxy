@@ -72,12 +72,10 @@ export default function Love() {
               variants={cardVariants}
               whileHover={{ 
                 y: -10,
-                borderColor: "#9EA76B",
-                backgroundColor: "#EFE8CA",
                 boxShadow: "0 24px 48px rgba(158, 167, 107, 0.12)"
               }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-milky-surface border-3 border-matcha/35 rounded-[40px] p-12 flex flex-col gap-6 cursor-default transition-colors duration-500 relative"
+              className="bg-milky-surface hover:bg-milky border-3 border-matcha/35 hover:border-matcha rounded-[40px] p-12 flex flex-col gap-6 cursor-default transition-all duration-500 relative"
             >
               {/* Number Badge and Icon Row */}
               <div className="flex justify-between items-start">

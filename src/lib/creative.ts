@@ -5,7 +5,7 @@ export interface CreativeItem {
   id: string;
   src: string;
   title: string;
-  category: "photography" | "design";
+  category: "photography" | "design" | "traditional" | "digital";
   description: string;
   details: string;
 }
@@ -19,11 +19,14 @@ export function getDynamicCreativeItems(): CreativeItem[] {
   }
 
   try {
-    const categories: ("photography" | "design")[] = ["photography", "design"];
+    const categories: ("photography" | "design" | "traditional" | "digital")[] = ["photography", "design", "traditional", "digital"];
 
     for (const category of categories) {
-      // Look inside public/Creative/Photography or Design (case-insensitive checking)
-      const folderName = category === "photography" ? "Photography" : "Design";
+      // Look inside public/Creative folders
+      const folderName = 
+        category === "photography" ? "Photography" :
+        category === "design" ? "Design" :
+        category === "traditional" ? "Traditional" : "Digital";
       const folderPath = path.join(creativeDir, folderName);
 
       if (!fs.existsSync(folderPath)) {
@@ -57,7 +60,10 @@ export function getDynamicCreativeItems(): CreativeItem[] {
 
           // 3. Metadata extraction (check for baseName.txt companion file)
           let description = "A beautiful visual exploration of texture, layout, and lighting.";
-          let details = category === "photography" ? "Camera Photograph" : "Digital Graphic Art";
+          let details = 
+            category === "photography" ? "Camera Photograph" :
+            category === "design" ? "Digital Graphic Art" :
+            category === "traditional" ? "Traditional Hand-crafted Art" : "Digital Visual Art";
 
           const companionTxt = files.find(f => f.toLowerCase() === `${baseName.toLowerCase()}.txt`);
           if (companionTxt) {

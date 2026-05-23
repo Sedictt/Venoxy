@@ -52,7 +52,7 @@ export default function Contact() {
 
             {/* Contact Button */}
             <motion.a
-              href="mailto:hello@example.com"
+              href="mailto:venoxyarts@gmail.com"
               whileHover={{ 
                 y: -6, 
                 scale: 1.04,
