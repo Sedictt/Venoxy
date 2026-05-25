@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
+import { Mail, FileText } from "lucide-react";
 
 export default function Contact() {
   return (
@@ -50,20 +50,38 @@ export default function Contact() {
               Currently accepting freelance projects and collaborations with design-forward agencies and startups.
             </p>
 
-            {/* Contact Button */}
-            <motion.a
-              href="mailto:venoxyarts@gmail.com"
-              whileHover={{ 
-                y: -6, 
-                scale: 1.04,
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="inline-flex items-center gap-3 bg-olive-primary dark:bg-matcha text-milky-surface hover:bg-[#858D5A] dark:hover:bg-matcha-hover font-display font-bold uppercase text-sm tracking-widest px-10 py-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Mail className="w-5 h-5" />
-              Get in touch
-            </motion.a>
+            {/* Contact & Resume Buttons */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <motion.a
+                href="mailto:venoxyarts@gmail.com"
+                whileHover={{ 
+                  y: -6, 
+                  scale: 1.04,
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="inline-flex items-center gap-3 bg-olive-primary dark:bg-matcha text-milky-surface hover:bg-[#858D5A] dark:hover:bg-matcha-hover font-display font-bold uppercase text-sm tracking-widest px-10 py-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <Mail className="w-5 h-5" />
+                Get in touch
+              </motion.a>
+
+              <motion.a
+                href="/CV-ATS-Updated.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ 
+                  y: -6, 
+                  scale: 1.04,
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="inline-flex items-center gap-3 border-2 border-milky-surface dark:border-matcha text-milky-surface dark:text-matcha hover:bg-milky-surface dark:hover:bg-matcha hover:text-matcha dark:hover:text-milky-surface font-display font-bold uppercase text-sm tracking-widest px-10 py-[18px] rounded-xl transition-all duration-300 shadow-md"
+              >
+                <FileText className="w-5 h-5" />
+                View Resume
+              </motion.a>
+            </div>
           </div>
         </motion.div>
       </div>

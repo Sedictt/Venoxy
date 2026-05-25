@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeToggle";
 import { TransitionLink } from "@/components/transitions/PageTransitionProvider";
-import { Images } from "lucide-react";
+import { Images, FileText } from "lucide-react";
+import { Tooltip } from "./Tooltip";
 
 const navLinks = [
   { id: "hero", label: "About" },
@@ -151,28 +152,48 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/* Call to Action, Gallery Link, & Theme Toggle (Upper Right) */}
+        {/* Call to Action, Gallery Link, Resume Link, & Theme Toggle (Upper Right) */}
         <div className="flex-1 flex justify-end items-center gap-2.5 sm:gap-3.5">
-          <ThemeToggle />
+          <Tooltip content="Toggle Theme" position="bottom">
+            <ThemeToggle />
+          </Tooltip>
           
           {/* Creative Archive Shortcut Link (Transitions smoothly via Block Wipe) */}
-          <TransitionLink
-            href="/gallery"
-            className="relative flex items-center justify-center w-11 h-11 rounded-full border-2 border-matcha bg-milky-surface/40 hover:bg-matcha text-matcha hover:text-milky-surface transition-all duration-300 shadow-md shrink-0 cursor-pointer hover:scale-105 hover:-translate-y-0.5 group z-50"
-            title="Explore Creative Archive"
-            aria-label="Open Creative Gallery"
-          >
-            <Images className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
-          </TransitionLink>
+          <Tooltip content="Creative Gallery" position="bottom">
+            <TransitionLink
+              href="/gallery"
+              className="relative flex items-center justify-center w-11 h-11 rounded-full border-2 border-matcha bg-milky-surface/40 hover:bg-matcha text-matcha hover:text-milky-surface transition-all duration-300 shadow-md shrink-0 cursor-pointer hover:scale-105 hover:-translate-y-0.5 group z-50"
+              title="Explore Creative Archive"
+              aria-label="Open Creative Gallery"
+            >
+              <Images className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+            </TransitionLink>
+          </Tooltip>
+
+          {/* Resume PDF Link */}
+          <Tooltip content="View CV / Resume" position="bottom">
+            <a
+              href="/CV-ATS-Updated.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative flex items-center justify-center w-11 h-11 rounded-full border-2 border-matcha bg-milky-surface/40 hover:bg-matcha text-matcha hover:text-milky-surface transition-all duration-300 shadow-md shrink-0 cursor-pointer hover:scale-105 hover:-translate-y-0.5 group z-50"
+              title="View Resume / CV"
+              aria-label="View Resume PDF"
+            >
+              <FileText className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
+            </a>
+          </Tooltip>
 
           <div className="hidden sm:block">
-            <a 
-              href="#contact" 
-              onClick={(e) => handleLinkClick(e, "contact")}
-              className="bg-matcha hover:bg-matcha-hover text-milky-surface px-6 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-sm inline-flex items-center gap-2 hover:scale-[1.03] hover:-translate-y-0.5"
-            >
-              Let&apos;s Talk
-            </a>
+            <Tooltip content="Get In Touch" position="bottom">
+              <a 
+                href="#contact" 
+                onClick={(e) => handleLinkClick(e, "contact")}
+                className="bg-matcha hover:bg-matcha-hover text-milky-surface px-6 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider transition-all duration-300 shadow-sm inline-flex items-center gap-2 hover:scale-[1.03] hover:-translate-y-0.5"
+              >
+                Let&apos;s Talk
+              </a>
+            </Tooltip>
           </div>
         </div>
       </div>

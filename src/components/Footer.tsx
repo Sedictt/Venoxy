@@ -91,6 +91,16 @@ export default function Footer() {
                   Contact
                 </a>
               </li>
+              <li>
+                <a 
+                  href="/CV-ATS-Updated.pdf" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-olive-primary hover:text-matcha transition-colors"
+                >
+                  Resume
+                </a>
+              </li>
             </ul>
           </div>
 

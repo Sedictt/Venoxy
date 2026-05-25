@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { ArrowUpRight, X, ArrowRight, ArrowUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { Tooltip } from "./Tooltip";
 
 interface Project {
   id: string;
@@ -214,13 +215,17 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             data-lenis-prevent="true"
           >
             {/* Modal Close Floating Button */}
-            <button
-              onClick={handleCloseModal}
-              className="fixed top-8 right-8 w-14 h-14 rounded-full bg-milky-surface border border-matcha/30 hover:border-matcha hover:bg-matcha hover:text-milky-surface flex items-center justify-center cursor-pointer transition-all duration-300 shadow-[0_8px_24px_rgba(65,70,42,0.08)] group z-50"
-              aria-label="Close Details Modal"
-            >
-              <X className="w-6 h-6 transition-transform duration-500 group-hover:rotate-90" />
-            </button>
+            <div className="fixed top-8 right-8 z-50">
+              <Tooltip content="Close details" position="left">
+                <button
+                  onClick={handleCloseModal}
+                  className="w-14 h-14 rounded-full bg-milky-surface border border-matcha/30 hover:border-matcha hover:bg-matcha hover:text-milky-surface flex items-center justify-center cursor-pointer transition-all duration-300 shadow-[0_8px_24px_rgba(65,70,42,0.08)] group"
+                  aria-label="Close Details Modal"
+                >
+                  <X className="w-6 h-6 transition-transform duration-500 group-hover:rotate-90" />
+                </button>
+              </Tooltip>
+            </div>
 
             {/* Scrollable Container */}
             <div className="max-w-[1100px] mx-auto px-6 py-24 min-h-screen flex flex-col">
@@ -540,13 +545,15 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                          {/* Action Buttons */}
               <div className="flex items-center gap-3">
                 {/* Close Button */}
-                <button
-                  onClick={() => setLightboxImageIndex(null)}
-                  className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center cursor-pointer transition-all duration-300 group"
-                  aria-label="Close Lightbox"
-                >
-                  <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-                </button>
+                <Tooltip content="Close view" position="bottom">
+                  <button
+                    onClick={() => setLightboxImageIndex(null)}
+                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center cursor-pointer transition-all duration-300 group"
+                    aria-label="Close Lightbox"
+                  >
+                    <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
+                  </button>
+                </Tooltip>
               </div>
             </div>
 
@@ -556,18 +563,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Navigation - Left Arrow */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLightboxImageIndex(prev => 
-                    prev !== null ? (prev - 1 + selectedProject.images.length) % selectedProject.images.length : null
-                  );
-                }}
-                className="absolute left-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center text-white cursor-pointer transition-all duration-300 z-50 max-sm:left-2"
-                aria-label="Previous Screenshot"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
+              <div className="absolute left-6 z-50 max-sm:left-2">
+                <Tooltip content="Previous Image" position="right">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxImageIndex(prev => 
+                        prev !== null ? (prev - 1 + selectedProject.images.length) % selectedProject.images.length : null
+                      );
+                    }}
+                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center text-white cursor-pointer transition-all duration-300"
+                    aria-label="Previous Screenshot"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                </Tooltip>
+              </div>
 
               {/* The Image Display with Zoom capabilities */}
               <div 
@@ -654,18 +665,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               )}
 
               {/* Navigation - Right Arrow */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setLightboxImageIndex(prev => 
-                    prev !== null ? (prev + 1) % selectedProject.images.length : null
-                  );
-                }}
-                className="absolute right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center text-white cursor-pointer transition-all duration-300 z-50 max-sm:right-2"
-                aria-label="Next Screenshot"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
+              <div className="absolute right-6 z-50 max-sm:right-2">
+                <Tooltip content="Next Image" position="left">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxImageIndex(prev => 
+                        prev !== null ? (prev + 1) % selectedProject.images.length : null
+                      );
+                    }}
+                    className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center text-white cursor-pointer transition-all duration-300"
+                    aria-label="Next Screenshot"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </Tooltip>
+              </div>
             </div>
 
             {/* Lightbox Footer controls */}
