@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { ArrowLeft, ChevronLeft, ChevronRight, X, Maximize2, Camera, Info, Laptop, Palette, Sparkles, Layers, ZoomIn, ZoomOut } from "lucide-react";
 import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
@@ -9,11 +9,14 @@ import Masonry from "./Masonry";
 interface CreativeItem {
   id: string;
   src: string;
+  thumbSrc: string;
+  blurDataURL: string;
   title: string;
   category: "photography" | "design" | "traditional" | "digital" | "others";
   description: string;
   details: string;
-  aspectRatio: number;
+  width: number;
+  height: number;
 }
 
 interface CreativeGalleryProps {
@@ -29,40 +32,87 @@ const tabIcons = {
   others: Info
 };
 
+const preloadedImages = new Set<string>();
+
+const preloadImage = (src: string, priority: "high" | "low" = "low") => {
+  if (!src || preloadedImages.has(src) || typeof window === "undefined") return;
+
+  preloadedImages.add(src);
+  const image = new window.Image();
+  image.decoding = "async";
+  image.fetchPriority = priority;
+  image.src = src;
+};
+
 export default function CreativeGallery({ initialItems = [] }: CreativeGalleryProps) {
   const [activeTab, setActiveTab] = useState<"all" | "photography" | "design" | "traditional" | "digital" | "others">("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [shuffledItems, setShuffledItems] = useState<CreativeItem[]>([]);
   const [zoomScale, setZoomScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
 
-  // Shuffle items once on mount (client-side only to prevent SSR hydration mismatch)
-  useEffect(() => {
-    let active = true;
-    const shuffle = (array: CreativeItem[]) => {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+  const baseItems = useMemo(() => {
+    const hash = (value: string) => {
+      let result = 0;
+      for (let i = 0; i < value.length; i++) {
+        result = Math.imul(31, result) + value.charCodeAt(i) | 0;
       }
-      return arr;
+      return result;
     };
 
-    Promise.resolve().then(() => {
-      if (active) {
-        setShuffledItems(shuffle(initialItems));
-      }
-    });
-
-    return () => {
-      active = false;
-    };
+    return [...initialItems].sort((a, b) => hash(a.id) - hash(b.id));
   }, [initialItems]);
 
-  // Use shuffled items if ready on the client, falling back to initialItems for hydration safety
-  const baseItems = shuffledItems.length > 0 ? shuffledItems : initialItems;
+  useEffect(() => {
+    if (baseItems.length === 0 || typeof window === "undefined") return;
+
+    let cancelled = false;
+    const originals = baseItems
+      .map(item => item.src)
+      .filter((src, index, list) => src && list.indexOf(src) === index);
+
+    baseItems.forEach(item => {
+      preloadImage(item.thumbSrc, "high");
+      if (item.blurDataURL) preloadImage(item.blurDataURL, "low");
+    });
+
+    const preloadOriginals = () => {
+      let cursor = 0;
+      const concurrency = 4;
+
+      const loadNext = () => {
+        if (cancelled || cursor >= originals.length) return;
+
+        const src = originals[cursor];
+        cursor += 1;
+        preloadImage(src, "low");
+
+        window.setTimeout(loadNext, 80);
+      };
+
+      for (let i = 0; i < concurrency; i += 1) {
+        loadNext();
+      }
+    };
+
+    const idleId = "requestIdleCallback" in window
+      ? window.requestIdleCallback(preloadOriginals, { timeout: 1200 })
+      : undefined;
+    const timeoutId = idleId === undefined
+      ? window.setTimeout(preloadOriginals, 800)
+      : undefined;
+
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
+  }, [baseItems]);
 
   // Filter items based on active category tab
   const filteredItems = baseItems.filter(item => {
@@ -87,10 +137,12 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
 
   // Reset zoom scale and drag position when item changes
   useEffect(() => {
-    setZoomScale(1);
-    dragX.set(0);
-    dragY.set(0);
-  }, [lightboxIndex]);
+    Promise.resolve().then(() => {
+      setZoomScale(1);
+      dragX.set(0);
+      dragY.set(0);
+    });
+  }, [lightboxIndex, dragX, dragY]);
 
   // Centering reset when zoomScale is reset to 1
   useEffect(() => {
@@ -98,7 +150,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
       dragX.set(0);
       dragY.set(0);
     }
-  }, [zoomScale]);
+  }, [zoomScale, dragX, dragY]);
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const zoomFactor = e.deltaY < 0 ? 0.15 : -0.15;
@@ -327,10 +379,13 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
               items={filteredItems.map((item, idx) => ({
                 id: item.id,
                 img: item.src,
+                thumbSrc: item.thumbSrc,
+                blurDataURL: item.blurDataURL,
                 title: item.title,
                 category: item.category,
                 details: item.details,
-                aspectRatio: item.aspectRatio,
+                width: item.width,
+                heightPx: item.height,
                 originalIndex: idx
               }))}
               ease="power3.out"

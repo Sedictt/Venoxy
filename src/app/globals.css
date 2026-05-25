@@ -62,6 +62,13 @@ body {
   overflow-x: hidden;
 }
 
+.is-scrolling .group:hover img,
+.is-scrolling .group:hover svg,
+.is-scrolling .group:hover div,
+.is-scrolling .group:hover span {
+  transition-duration: 0ms !important;
+}
+
 ::selection {
   background-color: var(--theme-matcha);
   color: var(--theme-milky-surface);
@@ -152,4 +159,3 @@ html.lenis, html.lenis body {
 .wave-delay-8 { animation-delay: 4.2s; }
 .wave-delay-9 { animation-delay: 4.8s; }
 .wave-delay-10 { animation-delay: 5.4s; }
-

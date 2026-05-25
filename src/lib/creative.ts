@@ -1,19 +1,26 @@
 import fs from "fs";
 import path from "path";
-import sizeOf from "image-size";
+import { imageSize } from "image-size";
 
 export interface CreativeItem {
   id: string;
   src: string;
+  thumbSrc: string;
+  blurDataURL: string;
   title: string;
   category: "photography" | "design" | "traditional" | "digital" | "others";
   description: string;
   details: string;
-  aspectRatio: number;
+  width: number;
+  height: number;
 }
 
 export function getDynamicCreativeItems(): CreativeItem[] {
   const creativeDir = path.join(process.cwd(), "public", "Creative");
+  const manifestPath = path.join(creativeDir, "_generated", "gallery-assets.json");
+  const assetManifest: Record<string, Partial<CreativeItem>> = fs.existsSync(manifestPath)
+    ? JSON.parse(fs.readFileSync(manifestPath, "utf-8"))
+    : {};
   const items: CreativeItem[] = [];
 
   if (!fs.existsSync(creativeDir)) {
@@ -59,6 +66,19 @@ export function getDynamicCreativeItems(): CreativeItem[] {
           const src = folderPath.includes("Creative")
             ? `/Creative/${folderName}/${file}`
             : `/Others/${file}`;
+          const asset = assetManifest[src];
+          let width = asset?.width ?? 1;
+          let height = asset?.height ?? 1;
+
+          if (!asset) {
+            try {
+              const dimensions = imageSize(fs.readFileSync(filePath));
+              width = dimensions.width ?? width;
+              height = dimensions.height ?? height;
+            } catch (err) {
+              console.error(`Failed to read dimensions for creative item ${baseName}:`, err);
+            }
+          }
 
           // 2. Custom Title generation: Capitalize and replace hyphens/underscores with spaces
           let title = baseName
@@ -92,25 +112,17 @@ export function getDynamicCreativeItems(): CreativeItem[] {
             }
           }
 
-          let aspectRatio = 1;
-          try {
-            const buffer = fs.readFileSync(filePath);
-            const dimensions = sizeOf(buffer);
-            if (dimensions && dimensions.width && dimensions.height) {
-              aspectRatio = dimensions.height / dimensions.width;
-            }
-          } catch (err) {
-            console.error(`Failed to get dimensions for ${filePath}:`, err);
-          }
-
           items.push({
             id: `${category}_${baseName}`,
             src,
+            thumbSrc: asset?.thumbSrc ?? src,
+            blurDataURL: asset?.blurDataURL ?? "",
             title,
             category,
             description,
             details,
-            aspectRatio
+            width,
+            height
           });
         }
       }
