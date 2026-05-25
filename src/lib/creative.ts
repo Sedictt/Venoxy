@@ -1,13 +1,15 @@
 import fs from "fs";
 import path from "path";
+import sizeOf from "image-size";
 
 export interface CreativeItem {
   id: string;
   src: string;
   title: string;
-  category: "photography" | "design" | "traditional" | "digital";
+  category: "photography" | "design" | "traditional" | "digital" | "others";
   description: string;
   details: string;
+  aspectRatio: number;
 }
 
 export function getDynamicCreativeItems(): CreativeItem[] {
@@ -19,15 +21,21 @@ export function getDynamicCreativeItems(): CreativeItem[] {
   }
 
   try {
-    const categories: ("photography" | "design" | "traditional" | "digital")[] = ["photography", "design", "traditional", "digital"];
+    const categories: ("photography" | "design" | "traditional" | "digital" | "others")[] = ["photography", "design", "traditional", "digital", "others"];
 
     for (const category of categories) {
       // Look inside public/Creative folders
       const folderName = 
         category === "photography" ? "Photography" :
         category === "design" ? "Design" :
-        category === "traditional" ? "Traditional" : "Digital";
-      const folderPath = path.join(creativeDir, folderName);
+        category === "traditional" ? "Traditional" :
+        category === "digital" ? "Digital" : "Others";
+      let folderPath = path.join(creativeDir, folderName);
+
+      // Support fallback if 'Others' is directly in public/Others
+      if (!fs.existsSync(folderPath) && category === "others") {
+        folderPath = path.join(process.cwd(), "public", "Others");
+      }
 
       if (!fs.existsSync(folderPath)) {
         continue;
@@ -48,7 +56,9 @@ export function getDynamicCreativeItems(): CreativeItem[] {
 
         if (stat.isFile()) {
           // 1. Image URL relative to public directory
-          const src = `/Creative/${folderName}/${file}`;
+          const src = folderPath.includes("Creative")
+            ? `/Creative/${folderName}/${file}`
+            : `/Others/${file}`;
 
           // 2. Custom Title generation: Capitalize and replace hyphens/underscores with spaces
           let title = baseName
@@ -63,7 +73,8 @@ export function getDynamicCreativeItems(): CreativeItem[] {
           let details = 
             category === "photography" ? "Camera Photograph" :
             category === "design" ? "Digital Graphic Art" :
-            category === "traditional" ? "Traditional Hand-crafted Art" : "Digital Visual Art";
+            category === "traditional" ? "Traditional Hand-crafted Art" :
+            category === "digital" ? "Digital Visual Art" : "Other Visual Art";
 
           const companionTxt = files.find(f => f.toLowerCase() === `${baseName.toLowerCase()}.txt`);
           if (companionTxt) {
@@ -81,13 +92,25 @@ export function getDynamicCreativeItems(): CreativeItem[] {
             }
           }
 
+          let aspectRatio = 1;
+          try {
+            const buffer = fs.readFileSync(filePath);
+            const dimensions = sizeOf(buffer);
+            if (dimensions && dimensions.width && dimensions.height) {
+              aspectRatio = dimensions.height / dimensions.width;
+            }
+          } catch (err) {
+            console.error(`Failed to get dimensions for ${filePath}:`, err);
+          }
+
           items.push({
             id: `${category}_${baseName}`,
             src,
             title,
             category,
             description,
-            details
+            details,
+            aspectRatio
           });
         }
       }

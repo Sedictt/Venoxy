@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, X, ArrowRight, ArrowUp, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
+import { ArrowUpRight, X, ArrowRight, ArrowUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 
 interface Project {
   id: string;
@@ -28,6 +28,10 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
   const [galleryPage, setGalleryPage] = useState(1);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
   const [longImages, setLongImages] = useState<Record<string, boolean>>({});
+  const [zoomScale, setZoomScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
 
   const ITEMS_PER_PAGE = 4;
 
@@ -51,6 +55,26 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
       document.documentElement.classList.remove("modal-open");
     };
   }, [selectedProject]);
+
+  // Reset zoom scale and drag offsets when lightbox image changes
+  useEffect(() => {
+    setZoomScale(1);
+    dragX.set(0);
+    dragY.set(0);
+  }, [lightboxImageIndex]);
+
+  // Centering reset when zoomScale is reset to 1
+  useEffect(() => {
+    if (zoomScale === 1) {
+      dragX.set(0);
+      dragY.set(0);
+    }
+  }, [zoomScale]);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const zoomFactor = e.deltaY < 0 ? 0.15 : -0.15;
+    setZoomScale(prev => Math.min(4, Math.max(1, prev + zoomFactor)));
+  };
 
   // Keyboard navigation for Lightbox
   useEffect(() => {
@@ -513,20 +537,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   Screenshot {lightboxImageIndex + 1} of {selectedProject.images.length}
                 </p>
               </div>
-              
-              {/* Close Button */}
-              <button
-                onClick={() => setLightboxImageIndex(null)}
-                className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center cursor-pointer transition-all duration-300 group"
-                aria-label="Close Lightbox"
-              >
-                <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
-              </button>
+                         {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                {/* Close Button */}
+                <button
+                  onClick={() => setLightboxImageIndex(null)}
+                  className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 flex items-center justify-center cursor-pointer transition-all duration-300 group"
+                  aria-label="Close Lightbox"
+                >
+                  <X className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" />
+                </button>
+              </div>
             </div>
 
             {/* Main Image Container */}
             <div 
-              className="w-full flex-grow flex items-center justify-center relative px-4 my-4"
+              className="w-full flex-grow flex flex-col items-center justify-center relative px-4 my-4"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Navigation - Left Arrow */}
@@ -543,24 +569,89 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 <ChevronLeft className="w-6 h-6" />
               </button>
 
-              {/* The Image Display */}
+              {/* The Image Display with Zoom capabilities */}
               <div 
-                className={`relative max-w-[90vw] max-h-[70vh] transition-all duration-300 ${
+                ref={!longImages[selectedProject.images[lightboxImageIndex]] ? containerRef : undefined}
+                onWheel={!longImages[selectedProject.images[lightboxImageIndex]] ? handleWheel : undefined}
+                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 overflow-hidden ${
                   longImages[selectedProject.images[lightboxImageIndex]] 
                     ? "overflow-y-auto w-full max-w-[850px] aspect-[10/16] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar" 
-                    : "flex items-center justify-center"
+                    : "flex items-center justify-center rounded-lg bg-black/20"
                 }`}
               >
-                <img
+                <motion.img
+                  key={selectedProject.images[lightboxImageIndex]}
                   src={selectedProject.images[lightboxImageIndex]}
                   alt={formatImageTitle(selectedProject.images[lightboxImageIndex], selectedProject.id)}
-                  className={`shadow-2xl rounded-sm ${
+                  drag={!longImages[selectedProject.images[lightboxImageIndex]] && zoomScale > 1}
+                  dragConstraints={{
+                    left: -500 * (zoomScale - 1),
+                    right: 500 * (zoomScale - 1),
+                    top: -400 * (zoomScale - 1),
+                    bottom: 400 * (zoomScale - 1)
+                  }}
+                  dragElastic={0}
+                  dragMomentum={false}
+                  animate={{
+                    scale: !longImages[selectedProject.images[lightboxImageIndex]] ? zoomScale : 1
+                  }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  style={{
+                    x: dragX,
+                    y: dragY,
+                    cursor: !longImages[selectedProject.images[lightboxImageIndex]] && zoomScale > 1 ? "grab" : "default"
+                  }}
+                  className={`shadow-2xl rounded-sm select-none ${
                     longImages[selectedProject.images[lightboxImageIndex]]
                       ? "w-full h-auto object-contain object-top"
-                      : "max-w-full max-h-[70vh] object-contain"
+                      : "max-w-full max-h-[64vh] object-contain"
                   }`}
                 />
               </div>
+
+              {/* Floating Zoom Control Bar under the image (only for standard landscape/aspect ratio photos) */}
+              {!longImages[selectedProject.images[lightboxImageIndex]] && (
+                <div className="flex items-center gap-3 bg-white/[0.04] border border-white/10 px-4 py-2 rounded-full mt-4 backdrop-blur-md shadow-lg select-none z-50">
+                  <button 
+                    onClick={() => setZoomScale(prev => Math.max(1, prev - 0.25))}
+                    className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="4" 
+                    step="0.05" 
+                    value={zoomScale} 
+                    onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                    className="w-24 sm:w-36 h-1 bg-white/20 hover:bg-white/30 rounded-lg appearance-none cursor-pointer accent-matcha outline-none transition-all"
+                  />
+                  
+                  <button 
+                    onClick={() => setZoomScale(prev => Math.min(4, prev + 0.25))}
+                    className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                  
+                  <span className="text-[10px] text-white/50 font-bold font-mono min-w-[30px] text-right">
+                    {Math.round(zoomScale * 100)}%
+                  </span>
+
+                  {zoomScale > 1 && (
+                    <button 
+                      onClick={() => setZoomScale(1)}
+                      className="text-[9px] text-matcha font-extrabold uppercase tracking-wider pl-3 border-l border-white/10 hover:text-white cursor-pointer transition-colors"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Navigation - Right Arrow */}
               <button
@@ -582,7 +673,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               className="w-full max-w-[800px] px-6 text-center text-white/40 text-xs flex justify-center items-center gap-4 z-50 mb-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="max-sm:hidden font-semibold">Press Left/Right arrows or click navigation to browse</span>
+              <span className="max-sm:hidden font-semibold">Press Left/Right arrows or click navigation to browse • Use range slider to zoom & drag to pan</span>
             </div>
           </motion.div>
         )}
