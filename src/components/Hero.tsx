@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 
-export default function Hero() {
+interface HeroProps {
+  loaderCompleted: boolean;
+}
+
+export default function Hero({ loaderCompleted }: HeroProps) {
   const brandName = "venoxy arts";
 
   const containerVariants = {
@@ -69,7 +73,7 @@ export default function Hero() {
         <motion.a
           variants={fadeUpVariants}
           initial="hidden"
-          animate="visible"
+          animate={loaderCompleted ? "visible" : "hidden"}
           href="/CV-ATS-Updated.pdf"
           target="_blank"
           rel="noopener noreferrer"
@@ -83,7 +87,7 @@ export default function Hero() {
         <motion.a
           variants={fadeUpVariants}
           initial="hidden"
-          animate="visible"
+          animate={loaderCompleted ? "visible" : "hidden"}
           href="#contact"
           onClick={(e) => {
             e.preventDefault();
@@ -105,7 +109,7 @@ export default function Hero() {
       <motion.div
         variants={fadeUpVariants}
         initial="hidden"
-        animate="visible"
+        animate={loaderCompleted ? "visible" : "hidden"}
         className="absolute bottom-12 flex flex-col items-center gap-2 cursor-pointer z-10"
         onClick={() => {
           const projects = document.getElementById("projects");

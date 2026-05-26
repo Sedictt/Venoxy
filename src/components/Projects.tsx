@@ -17,6 +17,7 @@ interface Project {
   color: string;
   thumbnail: string;
   images: string[];
+  isThumbnailPortrait: boolean;
 }
 
 interface ProjectsProps {
@@ -37,8 +38,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
   const ITEMS_PER_PAGE = 4;
 
-  const totalPages = selectedProject ? Math.ceil(selectedProject.images.length / ITEMS_PER_PAGE) : 0;
-  const paginatedImages = selectedProject ? selectedProject.images.slice(
+  const galleryImages = selectedProject
+    ? selectedProject.images
+        .filter(img => img !== selectedProject.thumbnail)
+        .sort((a, b) => {
+          const aLower = a.toLowerCase();
+          const bLower = b.toLowerCase();
+          const aKey = aLower.includes("dashboard") || aLower.includes("home") || aLower.includes("overview");
+          const bKey = bLower.includes("dashboard") || bLower.includes("home") || bLower.includes("overview");
+          if (aKey && !bKey) return -1;
+          if (!aKey && bKey) return 1;
+          return 0;
+        })
+    : [];
+
+  const totalPages = selectedProject ? Math.ceil(galleryImages.length / ITEMS_PER_PAGE) : 0;
+  const paginatedImages = selectedProject ? galleryImages.slice(
     (galleryPage - 1) * ITEMS_PER_PAGE,
     galleryPage * ITEMS_PER_PAGE
   ) : [];
@@ -60,6 +75,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
   // Reset zoom scale and drag offsets when lightbox image changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setZoomScale(1);
     dragX.set(0);
     dragY.set(0);
@@ -316,7 +332,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               <motion.div 
                 onClick={() => setLightboxImageIndex(0)}
                 className={`w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero ${
-                  selectedProject.title.toLowerCase().includes("(mobile)")
+                  selectedProject.isThumbnailPortrait
                     ? "aspect-[10/16] max-w-[400px] mx-auto"
                     : "aspect-[16/10]"
                 }`}
@@ -346,7 +362,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   </div>
                   <div className="flex items-center gap-3 self-end md:self-auto">
                     <div className="text-xs uppercase font-bold tracking-widest text-olive-secondary bg-milky-surface px-4 py-2 border border-matcha/20 rounded-md">
-                      Page {galleryPage} of {totalPages} ({selectedProject.images.length} Total)
+                      Page {galleryPage} of {totalPages} ({galleryImages.length} Total)
                     </div>
                     {totalPages > 1 && (
                       <div className="flex gap-1.5">
@@ -384,7 +400,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 >
                   <AnimatePresence mode="popLayout">
                     {paginatedImages.map((src, pageIdx) => {
-                      const absoluteIdx = (galleryPage - 1) * ITEMS_PER_PAGE + pageIdx;
+                      const absoluteIdx = selectedProject.images.indexOf(src);
                       const isLong = !!longImages[src];
                       const title = formatImageTitle(src, selectedProject.id);
 

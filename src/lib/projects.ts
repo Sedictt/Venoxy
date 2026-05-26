@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { imageSize } from "image-size";
 
 export interface ProjectData {
   id: string;
@@ -13,6 +14,7 @@ export interface ProjectData {
   color: string;
   thumbnail: string;
   images: string[];
+  isThumbnailPortrait: boolean;
 }
 
 export function getDynamicProjects(): ProjectData[] {
@@ -101,6 +103,18 @@ export function getDynamicProjects(): ProjectData[] {
         const tagsRaw = readMetadataFile("tags.txt", "React, TypeScript, Next.js");
         const tags = tagsRaw.split(",").map(t => t.trim()).filter(t => t.length > 0);
 
+        // 6. Detect if the main thumbnail image is portrait or landscape
+        let isThumbnailPortrait = false;
+        try {
+          const mainImagePath = path.join(itemPath, mainImageFile);
+          const dimensions = imageSize(fs.readFileSync(mainImagePath));
+          if (dimensions.width && dimensions.height) {
+            isThumbnailPortrait = dimensions.height > dimensions.width;
+          }
+        } catch (e) {
+          console.error(`Failed to get dimensions for ${mainImageFile} in ${item}:`, e);
+        }
+
         projects.push({
           id: item,
           title,
@@ -112,7 +126,8 @@ export function getDynamicProjects(): ProjectData[] {
           link,
           color,
           thumbnail,
-          images
+          images,
+          isThumbnailPortrait
         });
       }
     }
