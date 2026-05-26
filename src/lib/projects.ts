@@ -131,6 +131,17 @@ export function getDynamicProjects(): ProjectData[] {
         });
       }
     }
+    // Sort projects according to the requested order: iReside, Ouria (Mobile), ItsOurStudio, librowse
+    const preferredOrder = ["iReside", "Ouria (Mobile)", "ItsOurStudio", "librowse"];
+    projects.sort((a, b) => {
+      const indexA = preferredOrder.findIndex(id => id.toLowerCase() === a.id.toLowerCase());
+      const indexB = preferredOrder.findIndex(id => id.toLowerCase() === b.id.toLowerCase());
+      
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      
+      return indexA - indexB;
+    });
 
     return projects;
   } catch (error) {
