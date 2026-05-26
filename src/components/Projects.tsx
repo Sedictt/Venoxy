@@ -31,6 +31,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
   const [longImages, setLongImages] = useState<Record<string, boolean>>({});
   const [zoomScale, setZoomScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const screenshotsSectionRef = useRef<HTMLDivElement>(null);
   const dragX = useMotionValue(0);
   const dragY = useMotionValue(0);
 
@@ -99,8 +100,9 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>, src: string) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
-    // Classify as long vertical screenshot if ratio > 1.25
-    if (naturalHeight > naturalWidth * 1.25) {
+    // Classify as long vertical screenshot if ratio > 1.25 and NOT a mobile project
+    const isMobile = selectedProject?.title.toLowerCase().includes("(mobile)");
+    if (naturalHeight > naturalWidth * 1.25 && !isMobile) {
       setLongImages(prev => ({ ...prev, [src]: true }));
     }
   };
@@ -143,6 +145,15 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
     if (modalContainer) {
       modalContainer.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setGalleryPage(page);
+    setTimeout(() => {
+      if (screenshotsSectionRef.current) {
+        screenshotsSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 50);
   };
 
 
@@ -304,7 +315,11 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               {/* Showcase Graphic */}
               <motion.div 
                 onClick={() => setLightboxImageIndex(0)}
-                className="w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero"
+                className={`w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero ${
+                  selectedProject.title.toLowerCase().includes("(mobile)")
+                    ? "aspect-[10/16] max-w-[400px] mx-auto"
+                    : "aspect-[16/10]"
+                }`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -319,7 +334,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               </motion.div>
 
               {/* Screenshots Gallery Section */}
-              <div className="mt-6 mb-20 border-t border-matcha/20 pt-16">
+              <div ref={screenshotsSectionRef} className="mt-6 mb-20 border-t border-matcha/20 pt-16">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
                   <div>
                     <h3 className="font-display font-bold text-2xl sm:text-3xl text-olive-primary">
@@ -329,8 +344,36 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                       Explore detailed interfaces and key systems of {selectedProject.title}
                     </p>
                   </div>
-                  <div className="text-xs uppercase font-bold tracking-widest text-olive-secondary bg-milky-surface px-4 py-2 border border-matcha/20 rounded-md">
-                    Page {galleryPage} of {totalPages} ({selectedProject.images.length} Total)
+                  <div className="flex items-center gap-3 self-end md:self-auto">
+                    <div className="text-xs uppercase font-bold tracking-widest text-olive-secondary bg-milky-surface px-4 py-2 border border-matcha/20 rounded-md">
+                      Page {galleryPage} of {totalPages} ({selectedProject.images.length} Total)
+                    </div>
+                    {totalPages > 1 && (
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePageChange(Math.max(1, galleryPage - 1));
+                          }}
+                          disabled={galleryPage === 1}
+                          className="w-9 h-9 rounded-full border border-matcha/30 flex items-center justify-center text-olive-primary disabled:opacity-30 disabled:pointer-events-none hover:bg-matcha hover:text-milky-surface hover:border-matcha cursor-pointer transition-all duration-300 shadow-sm bg-milky-surface"
+                          aria-label="Previous Page"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePageChange(Math.min(totalPages, galleryPage + 1));
+                          }}
+                          disabled={galleryPage === totalPages}
+                          className="w-9 h-9 rounded-full border border-matcha/30 flex items-center justify-center text-olive-primary disabled:opacity-30 disabled:pointer-events-none hover:bg-matcha hover:text-milky-surface hover:border-matcha cursor-pointer transition-all duration-300 shadow-sm bg-milky-surface"
+                          aria-label="Next Page"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -357,14 +400,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                         >
                           {/* Card Graphic Container */}
                           <div 
-                            className="w-full aspect-[16/10] rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative"
+                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${
+                              selectedProject.title.toLowerCase().includes("(mobile)")
+                                ? "aspect-[10/16] max-w-[320px] mx-auto"
+                                : "aspect-[16/10]"
+                            }`}
                           >
                             <img
                               src={src}
                               alt={title}
                               onLoad={(e) => handleImageLoad(e, src)}
                               className={`w-full h-full transition-transform duration-500 group-hover/card:scale-[1.03] ${
-                                isLong ? "object-cover object-top" : "object-cover object-center"
+                                selectedProject.title.toLowerCase().includes("(mobile)")
+                                  ? "object-cover object-top"
+                                  : isLong 
+                                    ? "object-cover object-top" 
+                                    : "object-cover object-center"
                               }`}
                             />
 
@@ -412,7 +463,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setGalleryPage(prev => Math.max(1, prev - 1));
+                        handlePageChange(Math.max(1, galleryPage - 1));
                       }}
                       disabled={galleryPage === 1}
                       className="w-10 h-10 rounded-full border border-matcha/30 flex items-center justify-center text-olive-primary disabled:opacity-30 disabled:pointer-events-none hover:bg-matcha hover:text-milky-surface hover:border-matcha cursor-pointer transition-all duration-300"
@@ -426,7 +477,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                         key={page}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setGalleryPage(page);
+                          handlePageChange(page);
                         }}
                         className={`w-10 h-10 rounded-full font-display font-bold text-xs cursor-pointer transition-all duration-300 ${
                           galleryPage === page
@@ -441,7 +492,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setGalleryPage(prev => Math.min(totalPages, prev + 1));
+                        handlePageChange(Math.min(totalPages, galleryPage + 1));
                       }}
                       disabled={galleryPage === totalPages}
                       className="w-10 h-10 rounded-full border border-matcha/30 flex items-center justify-center text-olive-primary disabled:opacity-30 disabled:pointer-events-none hover:bg-matcha hover:text-milky-surface hover:border-matcha cursor-pointer transition-all duration-300"
