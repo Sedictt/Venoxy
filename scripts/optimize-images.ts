@@ -1,3 +1,4 @@
+/// <reference types="bun-types" />
 import { file } from "bun";
 import fs from "fs";
 import path from "path";
