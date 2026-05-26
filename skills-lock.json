@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-retro": {
+      "source": "giannimassi/agent-retro",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "851d5883c7ba3f6e4bbbbabb0c9ff8f23b7f269d4224d75a3fae5078bc4a0d47"
+    }
+  }
+}
