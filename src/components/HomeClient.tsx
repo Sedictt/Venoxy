@@ -7,7 +7,6 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import AboutClipboard from "@/components/AboutClipboard";
 import Projects from "@/components/Projects";
-import Love from "@/components/Love";
 import Skills from "@/components/Skills";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
@@ -38,7 +37,6 @@ export default function HomeClient({ initialProjects }: HomeClientProps) {
           {/* We pass the loading state to Hero so its internal entry animations wait for the loader to finish */}
           <Hero loaderCompleted={loaderCompleted} />
           <AboutClipboard />
-          <Love />
           <Skills />
           <Projects initialProjects={initialProjects} />
           <Contact />

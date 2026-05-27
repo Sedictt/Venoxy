@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useMotionValue } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Camera, ArrowRight } from "lucide-react";
+import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
 import { Swanky_and_Moo_Moo } from "next/font/google";
 
 const swanky = Swanky_and_Moo_Moo({
@@ -224,49 +226,6 @@ const StarSticker = ({
   </motion.div>
 );
 
-// Leaf Shadows swaying in the breeze
-const LeafShadow = () => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 opacity-[0.06] select-none">
-    <motion.svg
-      animate={{
-        x: [0, 15, 0],
-        y: [0, 10, 0],
-        rotate: [0, 2, 0],
-      }}
-      transition={{
-        duration: 20,
-        repeat: Infinity,
-        ease: "easeInOut",
-      }}
-      className="absolute -top-20 -right-20 w-[600px] h-[600px] blur-[15px] fill-olive-primary"
-      viewBox="0 0 100 100"
-    >
-      <path d="M10,90 Q30,70 60,80 Q70,50 90,30 Q75,35 60,35 Q40,45 20,70 Z" />
-      <path d="M50,55 Q65,40 80,45 Q70,30 55,35 Q40,40 50,55 Z" />
-      <path d="M30,70 Q45,50 65,60 Q55,45 40,50 Q30,55 30,70 Z" />
-      <path d="M70,30 Q85,10 95,20 Q85,5 75,15 Q65,25 70,30 Z" />
-    </motion.svg>
-    <motion.svg
-      animate={{
-        x: [0, -10, 0],
-        y: [0, 8, 0],
-        rotate: [0, -1, 0],
-      }}
-      transition={{
-        duration: 24,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: 2,
-      }}
-      className="absolute -bottom-20 -left-20 w-[500px] h-[500px] blur-[12px] fill-olive-primary"
-      viewBox="0 0 100 100"
-    >
-      <path d="M90,10 Q70,30 40,20 Q30,50 10,70 Q25,65 40,65 Q60,55 80,30 Z" />
-      <path d="M50,45 Q35,60 20,55 Q30,70 45,65 Q60,60 50,45 Z" />
-    </motion.svg>
-  </div>
-);
-
 // High-fidelity physical coffee stain ring
 const CoffeeStain = ({ className = "" }: { className?: string }) => (
   <div
@@ -338,12 +297,14 @@ const Sticker = ({
   pinPos?: "top" | "none";
   textColor?: string;
 }) => {
+  const hoverRotation = rotation + (rotation >= 0 ? 4 : -4);
+
   return (
     <motion.div
       initial={{ rotate: rotation, x: xOffset, y: yOffset }}
       whileHover={{
         scale: 1.15,
-        rotate: rotation + (Math.random() > 0.5 ? 4 : -4),
+        rotate: hoverRotation,
         x: xOffset,
         y: yOffset - 8,
         zIndex: 30,
@@ -381,63 +342,18 @@ const Sticker = ({
   );
 };
 
-// Blurred foreground paper plane — rendered oversized as if close to the camera lens
-const BASE_LEFT_PX = -160; // -left-40
-const BASE_BOTTOM_PX = -128; // -bottom-32
-
-const BlurredPaperPlane = ({ debug = false }: { debug?: boolean }) => {
-  const dragX = useMotionValue(0);
-  const dragY = useMotionValue(0);
-  const [displayPos, setDisplayPos] = useState({
-    left: BASE_LEFT_PX,
-    bottom: BASE_BOTTOM_PX,
+// Blurred foreground paper plane — rendered as if close to the camera lens
+// Parallax: drifts as the section scrolls through the viewport
+const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement | null> }) => {
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
   });
-  const [width, setWidth] = useState(4800);
-  const [rotate, setRotate] = useState(-8);
-  const [copied, setCopied] = useState(false);
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [60, -60]);
 
-  const refreshDisplay = useCallback(() => {
-    setDisplayPos({
-      left: Math.round(BASE_LEFT_PX + dragX.get()),
-      bottom: Math.round(BASE_BOTTOM_PX + dragY.get()),
-    });
-  }, [dragX, dragY]);
-
-  const jsonOutput = JSON.stringify(
-    {
-      left: displayPos.left,
-      bottom: displayPos.bottom,
-      width,
-      rotate,
-      blur: "6px",
-    },
-    null,
-    2,
-  );
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(jsonOutput).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }, [jsonOutput]);
-
-  // ESC to exit debug mode
-  useEffect(() => {
-    if (!debug) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        localStorage.removeItem("planeDebug");
-        window.location.reload();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [debug]);
-
-  if (!debug) {
-    return (
-      <div className="absolute inset-0 pointer-events-none z-[9999] select-none">
+  return (
+    <div className="absolute inset-0 pointer-events-none z-[9999] select-none">
+      <motion.div style={{ y: parallaxY }}>
         <motion.img
           src="/assets/skills & tools/paper_plane.png"
           alt=""
@@ -460,181 +376,18 @@ const BlurredPaperPlane = ({ debug = false }: { debug?: boolean }) => {
             filter: "blur(6px)",
           }}
         />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {/* Debug info panel — bottom-right */}
-      <div className="fixed bottom-6 right-6 z-[99999] bg-black/85 backdrop-blur-md text-green-400 p-5 rounded-2xl font-mono text-xs shadow-2xl border border-white/10 min-w-[300px] pointer-events-auto select-none">
-        <div className="font-bold text-white mb-3 text-sm tracking-wide flex items-center gap-2">
-          <span className="text-lg">✈️</span> Plane Debug Mode
-          <span className="ml-auto inline-flex gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span
-              className="w-2 h-2 rounded-full bg-green-400/50 animate-pulse"
-              style={{ animationDelay: "300ms" }}
-            />
-            <span
-              className="w-2 h-2 rounded-full bg-green-400/30 animate-pulse"
-              style={{ animationDelay: "600ms" }}
-            />
-          </span>
-        </div>
-
-        {/* Position grid */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-3">
-          <div className="text-white/50">Left:</div>
-          <div className="text-white font-semibold text-right tabular-nums">
-            {displayPos.left}px
-          </div>
-          <div className="text-white/50">Bottom:</div>
-          <div className="text-white font-semibold text-right tabular-nums">
-            {displayPos.bottom}px
-          </div>
-        </div>
-
-        {/* Width slider */}
-        <div className="mb-2">
-          <div className="flex justify-between text-[10px] text-white/50 mb-1">
-            <span>Width</span>
-            <span className="text-white/80 font-bold">{width}px</span>
-          </div>
-          <input
-            type="range"
-            min={500}
-            max={8000}
-            step={50}
-            value={width}
-            onChange={(e) => setWidth(Number(e.target.value))}
-            className="w-full h-1.5 appearance-none cursor-pointer rounded-full bg-white/10 accent-green-500
-              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5
-              [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-400 [&::-webkit-slider-thumb]:shadow-md"
-          />
-        </div>
-
-        {/* Rotation slider */}
-        <div className="mb-3">
-          <div className="flex justify-between text-[10px] text-white/50 mb-1">
-            <span>Rotation</span>
-            <span className="text-white/80 font-bold">{rotate}deg</span>
-          </div>
-          <input
-            type="range"
-            min={-30}
-            max={30}
-            step={1}
-            value={rotate}
-            onChange={(e) => setRotate(Number(e.target.value))}
-            className="w-full h-1.5 appearance-none cursor-pointer rounded-full bg-white/10 accent-green-500
-              [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5
-              [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-400 [&::-webkit-slider-thumb]:shadow-md"
-          />
-        </div>
-
-        {/* JSON output */}
-        <pre className="p-2.5 bg-black/60 rounded-xl border border-white/10 text-[10px] leading-relaxed overflow-x-auto whitespace-pre-wrap">
-          {jsonOutput}
-        </pre>
-
-        <button
-          onClick={handleCopy}
-          className={`mt-3 w-full px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
-            copied
-              ? "bg-emerald-500 text-white"
-              : "bg-green-600/80 hover:bg-green-500 active:bg-green-400 text-white"
-          }`}
-        >
-          {copied ? "✓ Copied!" : "📋 Copy Position JSON"}
-        </button>
-
-        <div className="mt-2.5 text-yellow-400/50 text-[10px] text-center leading-relaxed">
-          Drag the plane · adjust sliders for size & rotation
-          <br />
-          <kbd className="px-1 py-0.5 bg-white/10 rounded text-white/70">
-            Ctrl+Shift+Alt+P
-          </kbd>{" "}
-          or triple-click to toggle
-          <br />
-          <kbd className="px-1 py-0.5 bg-white/10 rounded text-white/70">
-            ESC
-          </kbd>{" "}
-          to exit debug mode
-        </div>
-      </div>
-
-      {/* Draggable plane — fixed to viewport so it can cross section boundaries and overflow left */}
-      <div className="fixed inset-0 z-[9998] pointer-events-none overflow-visible">
-        <motion.img
-          src="/assets/skills & tools/paper_plane.png"
-          alt=""
-          aria-hidden="true"
-          drag
-          dragConstraints={false}
-          dragMomentum={false}
-          style={{ x: dragX, y: dragY, filter: "blur(6px)", width, rotate }}
-          onDrag={refreshDisplay}
-          onDragEnd={refreshDisplay}
-          className="absolute -bottom-32 -left-40 h-auto object-contain pointer-events-auto cursor-grab active:cursor-grabbing"
-          draggable={false}
-        />
-      </div>
-    </>
+      </motion.div>
+    </div>
   );
 };
 
 export default function Skills() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [planeDebug, setPlaneDebug] = useState(false);
-
-  // Check localStorage for plane debug mode on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setPlaneDebug(localStorage.getItem("planeDebug") === "true");
-    }
-  }, []);
-
-  // Toggle debug mode: Ctrl+Shift+Alt+P or triple-click the section
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.altKey && e.key.toLowerCase() === "p") {
-        e.preventDefault();
-        const next = !planeDebug;
-        setPlaneDebug(next);
-        localStorage.setItem("planeDebug", String(next));
-        if (next) {
-          window.location.reload();
-        }
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [planeDebug]);
-
-  // Triple-click on the section to toggle debug mode
-  const [clickCount, setClickCount] = useState(0);
-  const clickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleSectionClick = useCallback(() => {
-    setClickCount((c) => c + 1);
-    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
-    clickTimerRef.current = setTimeout(() => setClickCount(0), 600);
-  }, []);
-  useEffect(() => {
-    if (clickCount >= 3) {
-      setClickCount(0);
-      const next = !planeDebug;
-      setPlaneDebug(next);
-      localStorage.setItem("planeDebug", String(next));
-      if (next) window.location.reload();
-    }
-  }, [clickCount, planeDebug]);
 
   return (
     <section
       id="skills"
       ref={containerRef}
-      onClick={handleSectionClick}
       className="relative w-full py-16 sm:py-24 bg-milky transition-colors duration-500 overflow-visible"
       style={{
         backgroundImage: `
@@ -644,12 +397,8 @@ export default function Skills() {
         backgroundSize: "28px 28px",
       }}
     >
-      {/* Swaying leaf and window shadows in the foreground */}
-      <LeafShadow />
-
       {/* Realistic blurred Polaroid paper plane flying in the foreground */}
-      {/* Debug mode: Ctrl+Shift+Alt+P or triple-click section → draggable. ESC to exit. */}
-      <BlurredPaperPlane debug={planeDebug} />
+      <BlurredPaperPlane sectionRef={containerRef} />
 
       {/* Realistic physical coffee ring stains stamped on the desk grid paper */}
       <CoffeeStain className="bottom-12 left-10 opacity-[0.55] scale-110 sm:scale-125" />
@@ -1057,6 +806,38 @@ export default function Skills() {
             </Sticker>
           </div>
         </motion.div>
+      </div>
+
+      {/* Gallery CTA */}
+      <div className="flex justify-center mt-16 sm:mt-20 px-4 relative z-20">
+        <Link
+          href="/gallery"
+          className="group relative inline-flex w-full max-w-[680px] -rotate-[1.5deg] overflow-visible text-center transition-all duration-300 hover:-translate-y-1 hover:rotate-[0.5deg] sm:w-auto"
+        >
+          <StickyTape className="-top-3 left-8 rotate-[-10deg] w-16 h-4 opacity-80" />
+          <Pushpin className="-top-4 right-8 scale-105" />
+          <span
+            className="relative inline-flex w-full flex-col items-center gap-3 overflow-hidden border-2 border-[#2b2b2a] bg-[#fdfbdf] px-5 py-5 shadow-[6px_7px_1px_rgba(43,43,42,0.22)] transition-all duration-300 group-hover:bg-[#fff7c8] group-hover:shadow-[8px_10px_1px_rgba(43,43,42,0.24)] sm:w-auto sm:flex-row sm:gap-4 sm:px-7 sm:py-4"
+            style={{
+              clipPath:
+                "polygon(0% 0%, 100% 0%, 100% 78%, 94% 100%, 0% 100%)",
+            }}
+          >
+            <span className="absolute bottom-0 right-0 h-0 w-0 border-b-[22px] border-l-[34px] border-b-[#ded5a7] border-l-transparent shadow-[-2px_-2px_0_rgba(43,43,42,0.2)]" />
+            <span className="flex h-12 w-12 shrink-0 rotate-[-4deg] items-center justify-center border-2 border-[#2b2b2a] bg-[#5d7348] text-[#faf9f5] shadow-[3px_3px_0_rgba(43,43,42,0.22)] transition-transform duration-300 group-hover:rotate-[3deg] group-hover:scale-105">
+              <Camera className="h-5 w-5" />
+            </span>
+            <span className="flex min-w-0 flex-col gap-1 leading-tight sm:text-left">
+              <span className="font-display text-[11px] font-black uppercase tracking-widest text-[#5d7348]">
+                Photography & design gallery
+              </span>
+              <span className="text-sm font-black uppercase tracking-wider text-[#2b2b2a] sm:text-base">
+                Explore my Creative Archive
+              </span>
+            </span>
+            <ArrowRight className="h-5 w-5 shrink-0 text-[#5d7348] transition-transform duration-300 group-hover:translate-x-1.5" />
+          </span>
+        </Link>
       </div>
     </section>
   );

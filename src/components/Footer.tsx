@@ -66,15 +66,6 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="#love" 
-                  onClick={(e) => handleScroll(e, "love")}
-                  className="text-olive-primary hover:text-matcha transition-colors"
-                >
-                  Things I Love
-                </a>
-              </li>
-              <li>
-                <a 
                   href="#skills" 
                   onClick={(e) => handleScroll(e, "skills")}
                   className="text-olive-primary hover:text-matcha transition-colors"
