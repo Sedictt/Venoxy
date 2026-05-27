@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ThemeToggle } from "./ThemeToggle";
 import { TransitionLink } from "@/components/transitions/PageTransitionProvider";
 import { Images, FileText } from "lucide-react";
 import { Tooltip } from "./Tooltip";
@@ -154,10 +153,6 @@ export default function Navbar() {
 
         {/* Call to Action, Gallery Link, Resume Link, & Theme Toggle (Upper Right) */}
         <div className="flex-1 flex justify-end items-center gap-2.5 sm:gap-3.5">
-          <Tooltip content="Toggle Theme" position="bottom">
-            <ThemeToggle />
-          </Tooltip>
-          
           {/* Creative Archive Shortcut Link (Transitions smoothly via Block Wipe) */}
           <Tooltip content="Creative Gallery" position="bottom">
             <TransitionLink

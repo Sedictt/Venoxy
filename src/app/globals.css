@@ -29,8 +29,6 @@
   }
 }
 
-@custom-variant dark (&:is(.dark, .dark *));
-
 @layer base {
   :root {
     --theme-matcha: #9EA76B;
@@ -39,15 +37,6 @@
     --theme-milky-surface: #F6F3DF;
     --theme-olive-primary: #41462A;
     --theme-olive-secondary: #7A8155;
-  }
-
-  :root.dark {
-    --theme-matcha: #A9B17D;
-    --theme-matcha-hover: #C1C996;
-    --theme-milky: #1A1C14;
-    --theme-milky-surface: #25281D;
-    --theme-olive-primary: #F6F3DF;
-    --theme-olive-secondary: #A2AA7B;
   }
 }
 
