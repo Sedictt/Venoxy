@@ -56,13 +56,21 @@ export function getDynamicProjects(): ProjectData[] {
           continue; // Skip folders that have no images
         }
 
-        // 3. Find the main thumbnail image (contains 'main' as name, regardless of extension)
+        // 3. Find the main thumbnail image (contains 'banner' as name, regardless of extension)
         let mainImageFile = imageFiles.find(f => {
           const nameWithoutExt = path.parse(f).name.toLowerCase();
-          return nameWithoutExt === "main";
+          return nameWithoutExt === "banner";
         });
 
-        // Fallback: if no file named exactly 'main', grab the first image
+        // Fallback: if no file named exactly 'banner', look for 'main'
+        if (!mainImageFile) {
+          mainImageFile = imageFiles.find(f => {
+            const nameWithoutExt = path.parse(f).name.toLowerCase();
+            return nameWithoutExt === "main";
+          });
+        }
+
+        // Fallback: if still no file, grab the first image
         if (!mainImageFile) {
           mainImageFile = imageFiles[0];
         }

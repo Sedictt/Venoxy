@@ -1,0 +1,90 @@
+cv:
+  name: "Joseph Venedict G. Tillo"
+  headline: "Multimedia Intern"
+  location: "Valenzuela City, Philippines"
+  email: "jvtillo10@gmail.com"
+  phone: "+639913487293"
+  website: "https://venoxy.vercel.app"
+  social_networks:
+    - network: "LinkedIn"
+      username: "joseph-venedict-tillo-322213398"
+  sections:
+    summary:
+      - "Creative and detail-oriented Information Technology student with a
+        strong background in graphic design, visual communication, and digital
+        media production. Experienced in designing broadcast overlays, event
+        graphics, and promotional materials for live events, as well as game
+        art, short film production, and web UI/UX. Adept at translating concepts
+        into compelling visuals using Adobe Creative Suite, Canva, and other
+        design tools. Seeking a graphic design internship to apply and grow
+        creative skills in a professional environment."
+    experience:
+      - company: "Gamecon Esports — Itlympics 2026"
+        position: "Graphics and Broadcast Designer"
+        date: "2026"
+        highlights:
+          - "Designed broadcast overlays, event banners, tickets, and
+            promotional graphics for a school-wide esports event."
+          - "Assisted in live event broadcasting production, ensuring visual
+            consistency across all broadcast materials."
+      - company: "Rise of the Bakunawa — Itlympics 2026"
+        position: "Game Developer and Game Artist"
+        date: "2026"
+        highlights:
+          - "Designed and created all game art assets including character
+            sprites, backgrounds, and UI elements."
+          - "Contributed to game development and mechanics; won the People's
+            Choice Award at Gamecon."
+      - company: iReside Property Management System — Plv Capstone Project
+        position: "Web Developer"
+        start_date: "2026"
+        end_date: "present"
+        highlights:
+          - "Developing a full-stack property and tenant services management
+            platform for Valenzuela City landlords."
+          - "Responsible for frontend design and UI/UX implementation using
+            Next.js, React, and Tailwind CSS."
+      - company: it's ouR Studio
+        position: "Web Developer"
+        start_date: "2025"
+        end_date: "2026"
+        highlights:
+          - "Designed and developed a fully functional business website
+            currently in active use by the client."
+      - company: "Identity: 404 Not Found — Short Film (IT Film Fest 2025)"
+        position: "Co-Director and Cinematographer"
+        date: "2025"
+        highlights:
+          - "Co-directed and co-wrote the story and screenplay for a short film
+            that won 2nd Place."
+          - "Handled all videography and cinematography duties throughout
+            production."
+      - company: "Our Hands — Short Film"
+        position: "Film Director and Cinematographer"
+        date: "2024"
+        highlights:
+          - "Served as director, scriptwriter, storyboard artist, videographer,
+            and editor for the entire production."
+    education:
+      - institution: "Pamantasan ng Lungsod ng Valenzuela"
+        area: "Information Technology"
+        degree: "BS"
+        start_date: "2023"
+        end_date: "present"
+      - institution: "Datamex College of Saint Adeline"
+        area: "ICT Track"
+        start_date: "2021"
+        end_date: "2023"
+      - institution: "Malinta National High School"
+        area: "Junior High School"
+        start_date: "2017"
+        end_date: "2021"
+    skills:
+      - label: "Design and Visual"
+        details: "Graphic Design, UI/UX Design, Digital Art, Traditional Art,
+          Storyboarding, Photography, Cinematography"
+      - label: "Tools and Software"
+        details: "Adobe Creative Suite (Photoshop, Illustrator, Premiere Pro), Canva,
+          Video Editing Software"
+      - label: "Technical"
+        details: "Web Development, Next.js, React, TypeScript, Tailwind CSS"

@@ -40,16 +40,16 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
   const galleryImages = selectedProject
     ? selectedProject.images
-        .filter(img => img !== selectedProject.thumbnail)
-        .sort((a, b) => {
-          const aLower = a.toLowerCase();
-          const bLower = b.toLowerCase();
-          const aKey = aLower.includes("dashboard") || aLower.includes("home") || aLower.includes("overview");
-          const bKey = bLower.includes("dashboard") || bLower.includes("home") || bLower.includes("overview");
-          if (aKey && !bKey) return -1;
-          if (!aKey && bKey) return 1;
-          return 0;
-        })
+      .filter(img => img !== selectedProject.thumbnail)
+      .sort((a, b) => {
+        const aLower = a.toLowerCase();
+        const bLower = b.toLowerCase();
+        const aKey = aLower.includes("dashboard") || aLower.includes("home") || aLower.includes("overview");
+        const bKey = bLower.includes("dashboard") || bLower.includes("home") || bLower.includes("overview");
+        if (aKey && !bKey) return -1;
+        if (!aKey && bKey) return 1;
+        return 0;
+      })
     : [];
 
   const totalPages = selectedProject ? Math.ceil(galleryImages.length / ITEMS_PER_PAGE) : 0;
@@ -99,11 +99,11 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (lightboxImageIndex === null || !selectedProject) return;
       if (e.key === "ArrowLeft") {
-        setLightboxImageIndex(prev => 
+        setLightboxImageIndex(prev =>
           prev !== null ? (prev - 1 + selectedProject.images.length) % selectedProject.images.length : null
         );
       } else if (e.key === "ArrowRight") {
-        setLightboxImageIndex(prev => 
+        setLightboxImageIndex(prev =>
           prev !== null ? (prev + 1) % selectedProject.images.length : null
         );
       } else if (e.key === "Escape") {
@@ -126,13 +126,13 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
   const formatImageTitle = (src: string, projectId: string) => {
     const filename = src.split("/").pop()?.split(".")[0] || "";
     if (filename.toLowerCase() === "main") return "Main Overview";
-    
+
     let title = filename;
     const lowerProjId = projectId.toLowerCase();
     if (title.toLowerCase().startsWith(lowerProjId)) {
       title = title.substring(projectId.length);
     }
-    
+
     title = title.replace(/^[-_]+|[-_]+$/g, "");
     title = title.replace(/[-_]+/g, " ");
     return title.split(" ")
@@ -174,20 +174,20 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
 
   return (
-    <section id="projects" className="py-24 w-full">
+    <section id="projects" className="py-5 w-full">
       <div className="max-w-[1100px] mx-auto px-6">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           className="flex flex-col items-center mb-16 text-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <img 
-            src="/Projects/projects-title.png" 
-            alt="Projects Title" 
-            className="w-auto h-24 sm:h-32 md:h-40 object-contain select-none pointer-events-none" 
+          <img
+            src="/Projects/projects-title.png"
+            alt="Projects Title"
+            className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-none"
           />
         </motion.div>
 
@@ -256,7 +256,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             {/* Scrollable Container */}
             <div className="max-w-[1100px] mx-auto px-6 py-24 min-h-screen flex flex-col">
               {/* Header */}
-              <motion.div 
+              <motion.div
                 className="mb-16"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -275,7 +275,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               </motion.div>
 
               {/* Info Grid */}
-              <motion.div 
+              <motion.div
                 className="grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-12 sm:gap-16 mb-16"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -328,13 +328,12 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               </motion.div>
 
               {/* Showcase Graphic */}
-              <motion.div 
+              <motion.div
                 onClick={() => setLightboxImageIndex(0)}
-                className={`w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero ${
-                  selectedProject.isThumbnailPortrait
-                    ? "aspect-[10/16] max-w-[400px] mx-auto"
-                    : "aspect-[16/10]"
-                }`}
+                className={`w-full rounded-[40px] overflow-hidden border-[3px] border-matcha shadow-sm mb-20 bg-milky-surface cursor-pointer relative group/hero ${selectedProject.isThumbnailPortrait
+                  ? "aspect-[10/16] max-w-[400px] mx-auto"
+                  : "aspect-[16/10]"
+                  }`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
@@ -393,7 +392,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 </div>
 
                 {/* Image Grid with Framer Motion layout animations */}
-                <motion.div 
+                <motion.div
                   layout
                   className="grid grid-cols-1 sm:grid-cols-2 gap-8"
                 >
@@ -414,24 +413,22 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                           className="flex flex-col gap-3 group/card cursor-pointer"
                         >
                           {/* Card Graphic Container */}
-                          <div 
-                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${
-                              selectedProject.title.toLowerCase().includes("(mobile)")
-                                ? "aspect-[10/16] max-w-[320px] mx-auto"
-                                : "aspect-[16/10]"
-                            }`}
+                          <div
+                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${selectedProject.title.toLowerCase().includes("(mobile)")
+                              ? "aspect-[10/16] max-w-[320px] mx-auto"
+                              : "aspect-[16/10]"
+                              }`}
                           >
                             <img
                               src={src}
                               alt={title}
                               onLoad={(e) => handleImageLoad(e, src)}
-                              className={`w-full h-full transition-transform duration-500 group-hover/card:scale-[1.03] ${
-                                selectedProject.title.toLowerCase().includes("(mobile)")
+                              className={`w-full h-full transition-transform duration-500 group-hover/card:scale-[1.03] ${selectedProject.title.toLowerCase().includes("(mobile)")
+                                ? "object-cover object-top"
+                                : isLong
                                   ? "object-cover object-top"
-                                  : isLong 
-                                    ? "object-cover object-top" 
-                                    : "object-cover object-center"
-                              }`}
+                                  : "object-cover object-center"
+                                }`}
                             />
 
                             {/* Bottom Truncation Gradient Overlay & Action Badge */}
@@ -494,11 +491,10 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                           e.stopPropagation();
                           handlePageChange(page);
                         }}
-                        className={`w-10 h-10 rounded-full font-display font-bold text-xs cursor-pointer transition-all duration-300 ${
-                          galleryPage === page
-                            ? "bg-matcha text-milky-surface border border-matcha shadow-sm"
-                            : "bg-milky-surface border border-matcha/20 text-olive-primary hover:border-matcha hover:bg-matcha/5"
-                        }`}
+                        className={`w-10 h-10 rounded-full font-display font-bold text-xs cursor-pointer transition-all duration-300 ${galleryPage === page
+                          ? "bg-matcha text-milky-surface border border-matcha shadow-sm"
+                          : "bg-milky-surface border border-matcha/20 text-olive-primary hover:border-matcha hover:bg-matcha/5"
+                          }`}
                       >
                         {page}
                       </button>
@@ -532,10 +528,10 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 >
                   <div className="flex items-center gap-6">
                     <div className="w-20 h-14 rounded-md overflow-hidden bg-milky flex-shrink-0 border border-matcha/10">
-                      <img 
-                        src={projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].thumbnail} 
-                        alt="Next Project Thumbnail" 
-                        className="w-full h-full object-cover object-top" 
+                      <img
+                        src={projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].thumbnail}
+                        alt="Next Project Thumbnail"
+                        className="w-full h-full object-cover object-top"
                       />
                     </div>
                     <div>
@@ -596,7 +592,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             onClick={() => setLightboxImageIndex(null)}
           >
             {/* Lightbox Header with Title & Info */}
-            <div 
+            <div
               className="w-full max-w-[1100px] px-6 flex justify-between items-center text-white/90 z-50 mt-4"
               onClick={(e) => e.stopPropagation()}
             >
@@ -608,7 +604,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   Screenshot {lightboxImageIndex + 1} of {selectedProject.images.length}
                 </p>
               </div>
-                         {/* Action Buttons */}
+              {/* Action Buttons */}
               <div className="flex items-center gap-3">
                 {/* Close Button */}
                 <Tooltip content="Close view" position="bottom">
@@ -624,7 +620,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             </div>
 
             {/* Main Image Container */}
-            <div 
+            <div
               className="w-full flex-grow flex flex-col items-center justify-center relative px-4 my-4"
               onClick={(e) => e.stopPropagation()}
             >
@@ -634,7 +630,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLightboxImageIndex(prev => 
+                      setLightboxImageIndex(prev =>
                         prev !== null ? (prev - 1 + selectedProject.images.length) % selectedProject.images.length : null
                       );
                     }}
@@ -647,14 +643,13 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               </div>
 
               {/* The Image Display with Zoom capabilities */}
-              <div 
+              <div
                 ref={!longImages[selectedProject.images[lightboxImageIndex]] ? containerRef : undefined}
                 onWheel={!longImages[selectedProject.images[lightboxImageIndex]] ? handleWheel : undefined}
-                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 overflow-hidden ${
-                  longImages[selectedProject.images[lightboxImageIndex]] 
-                    ? "overflow-y-auto w-full max-w-[850px] aspect-[10/16] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar" 
-                    : "flex items-center justify-center rounded-lg bg-black/20"
-                }`}
+                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 overflow-hidden ${longImages[selectedProject.images[lightboxImageIndex]]
+                  ? "overflow-y-auto w-full max-w-[850px] aspect-[10/16] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar"
+                  : "flex items-center justify-center rounded-lg bg-black/20"
+                  }`}
               >
                 <motion.img
                   key={selectedProject.images[lightboxImageIndex]}
@@ -678,49 +673,48 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                     y: dragY,
                     cursor: !longImages[selectedProject.images[lightboxImageIndex]] && zoomScale > 1 ? "grab" : "default"
                   }}
-                  className={`shadow-2xl rounded-sm select-none ${
-                    longImages[selectedProject.images[lightboxImageIndex]]
-                      ? "w-full h-auto object-contain object-top"
-                      : "max-w-full max-h-[64vh] object-contain"
-                  }`}
+                  className={`shadow-2xl rounded-sm select-none ${longImages[selectedProject.images[lightboxImageIndex]]
+                    ? "w-full h-auto object-contain object-top"
+                    : "max-w-full max-h-[64vh] object-contain"
+                    }`}
                 />
               </div>
 
               {/* Floating Zoom Control Bar under the image (only for standard landscape/aspect ratio photos) */}
               {!longImages[selectedProject.images[lightboxImageIndex]] && (
                 <div className="flex items-center gap-3 bg-white/[0.04] border border-white/10 px-4 py-2 rounded-full mt-4 backdrop-blur-md shadow-lg select-none z-50">
-                  <button 
+                  <button
                     onClick={() => setZoomScale(prev => Math.max(1, prev - 0.25))}
                     className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
                     title="Zoom Out"
                   >
                     <ZoomOut className="w-4 h-4" />
                   </button>
-                  
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max="4" 
-                    step="0.05" 
-                    value={zoomScale} 
+
+                  <input
+                    type="range"
+                    min="1"
+                    max="4"
+                    step="0.05"
+                    value={zoomScale}
                     onChange={(e) => setZoomScale(parseFloat(e.target.value))}
                     className="w-24 sm:w-36 h-1 bg-white/20 hover:bg-white/30 rounded-lg appearance-none cursor-pointer accent-matcha outline-none transition-all"
                   />
-                  
-                  <button 
+
+                  <button
                     onClick={() => setZoomScale(prev => Math.min(4, prev + 0.25))}
                     className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
                     title="Zoom In"
                   >
                     <ZoomIn className="w-4 h-4" />
                   </button>
-                  
+
                   <span className="text-[10px] text-white/50 font-bold font-mono min-w-[30px] text-right">
                     {Math.round(zoomScale * 100)}%
                   </span>
 
                   {zoomScale > 1 && (
-                    <button 
+                    <button
                       onClick={() => setZoomScale(1)}
                       className="text-[9px] text-matcha font-extrabold uppercase tracking-wider pl-3 border-l border-white/10 hover:text-white cursor-pointer transition-colors"
                     >
@@ -736,7 +730,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLightboxImageIndex(prev => 
+                      setLightboxImageIndex(prev =>
                         prev !== null ? (prev + 1) % selectedProject.images.length : null
                       );
                     }}
@@ -750,7 +744,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             </div>
 
             {/* Lightbox Footer controls */}
-            <div 
+            <div
               className="w-full max-w-[800px] px-6 text-center text-white/40 text-xs flex justify-center items-center gap-4 z-50 mb-4"
               onClick={(e) => e.stopPropagation()}
             >

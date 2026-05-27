@@ -512,7 +512,7 @@ export default function Skills() {
           </div>
 
           {/* Stickers Grid */}
-          <div className="grid grid-cols-3 gap-y-8 gap-x-4 sm:gap-x-6 justify-items-center items-center mt-auto mb-auto">
+          <div className="flex flex-wrap justify-center gap-y-8 gap-x-4 sm:gap-x-6 items-center mt-auto mb-auto">
             {/* REACT STICKER */}
             <Sticker label="React" rotation={-8} xOffset={-5} yOffset={-8}>
               <img
@@ -545,15 +545,6 @@ export default function Skills() {
               <img
                 src="/assets/skills & tools/Tailwind CSS.png"
                 alt="Tailwind CSS"
-                className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
-              />
-            </Sticker>
-
-            {/* POSTGRESQL STICKER */}
-            <Sticker label="PostgreSQL" rotation={-4} xOffset={-3} yOffset={8}>
-              <img
-                src="/assets/skills & tools/PostgresSQL.svg"
-                alt="PostgreSQL"
                 className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
               />
             </Sticker>
