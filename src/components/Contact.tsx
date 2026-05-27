@@ -1,89 +1,218 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Mail, FileText } from "lucide-react";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 
 export default function Contact() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Parallax Scroll Tracking
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  // Staggered vertical scroll offsets (Scroll Parallax)
+  const yLayer1 = useTransform(scrollYProgress, [0, 1], [0, 0]);
+  const yLayer2 = useTransform(scrollYProgress, [0, 1], [15, -15]);
+  const yLayer3 = useTransform(scrollYProgress, [0, 1], [25, -25]);
+  const yLayer4 = useTransform(scrollYProgress, [0, 1], [35, -35]);
+  const yLayer5 = useTransform(scrollYProgress, [0, 1], [45, -45]);
+  const yLayer6 = useTransform(scrollYProgress, [0, 1], [55, -55]);
+  const yLayer7 = useTransform(scrollYProgress, [0, 1], [70, -70]);
+  const yCta = useTransform(scrollYProgress, [0, 1], [60, -60]);
+
+  // Mouse Movement Parallax Tracking
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 90, damping: 20, mass: 0.6 };
+  const mouseXSpring = useSpring(mouseX, springConfig);
+  const mouseYSpring = useSpring(mouseY, springConfig);
+
+  // Mouse interactive offsets (Mouse Parallax)
+  const xLayer1 = useTransform(mouseXSpring, [-400, 400], [-3, 3]);
+  const yMouseLayer1 = useTransform(mouseYSpring, [-400, 400], [-3, 3]);
+
+  const xLayer2 = useTransform(mouseXSpring, [-400, 400], [-6, 6]);
+  const yMouseLayer2 = useTransform(mouseYSpring, [-400, 400], [-6, 6]);
+
+  const xLayer3 = useTransform(mouseXSpring, [-400, 400], [-10, 10]);
+  const yMouseLayer3 = useTransform(mouseYSpring, [-400, 400], [-10, 10]);
+
+  const xLayer4 = useTransform(mouseXSpring, [-400, 400], [-14, 14]);
+  const yMouseLayer4 = useTransform(mouseYSpring, [-400, 400], [-14, 14]);
+
+  const xLayer5 = useTransform(mouseXSpring, [-400, 400], [-18, 18]);
+  const yMouseLayer5 = useTransform(mouseYSpring, [-400, 400], [-18, 18]);
+
+  const xLayer6 = useTransform(mouseXSpring, [-400, 400], [-22, 22]);
+  const yMouseLayer6 = useTransform(mouseYSpring, [-400, 400], [-22, 22]);
+
+  const xLayer7 = useTransform(mouseXSpring, [-400, 400], [-28, 28]);
+  const yMouseLayer7 = useTransform(mouseYSpring, [-400, 400], [-28, 28]);
+
+  const xCta = useTransform(mouseXSpring, [-400, 400], [-30, 30]);
+  const yMouseCta = useTransform(mouseYSpring, [-400, 400], [-30, 30]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    const x = e.clientX - rect.left - width / 2;
+    const y = e.clientY - rect.top - height / 2;
+    
+    mouseX.set(x);
+    mouseY.set(y);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
   return (
-    <section id="contact" className="py-24 w-full">
-      <div className="max-w-[1100px] mx-auto px-6">
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ type: "spring", stiffness: 100, damping: 20 }}
-          className="relative bg-matcha dark:bg-milky-surface text-milky-surface dark:text-olive-primary px-8 py-20 sm:p-24 rounded-[40px] text-center shadow-[0_30px_60px_rgba(158,167,107,0.35)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] dark:border dark:border-matcha/20 overflow-hidden transition-colors duration-500"
-        >
-          {/* Organic Background Blobs */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 0.9, 1],
-                rotate: [0, 45, -45, 0],
-              }}
-              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -top-16 -left-16 w-60 h-60 rounded-full bg-matcha-hover/30 dark:bg-matcha/5 blur-[40px]"
-            />
-            <motion.div
-              animate={{
-                scale: [1, 0.8, 1.1, 1],
-                rotate: [0, -30, 30, 0],
-              }}
-              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-matcha-hover/20 dark:bg-matcha/5 blur-[50px]"
-            />
-          </div>
+    <section 
+      id="contact" 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="w-full relative transition-all duration-500 overflow-hidden cursor-default"
+    >
+      {/* Scoped GPU Hardware-Accelerated Animation Styles */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes contactTitleFloat {
+          0%, 100% {
+            transform: translateY(0px) translateZ(0);
+          }
+          50% {
+            transform: translateY(-8px) translateZ(0);
+          }
+        }
+        .contact-title-float {
+          animation: contactTitleFloat 4.5s ease-in-out infinite;
+          will-change: transform;
+        }
+      `}} />
 
-          <div className="relative z-10 max-w-[650px] mx-auto flex flex-col items-center">
-            {/* Tag */}
-            <span className="inline-block bg-milky-surface dark:bg-olive-primary text-matcha dark:text-milky-surface text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-sm mb-6 shadow-sm transition-colors duration-500">
-              Collaboration
-            </span>
-
-            {/* Title */}
-            <h2 className="font-display font-bold text-4xl sm:text-6xl text-milky-surface dark:text-olive-primary leading-none mb-6 tracking-tight transition-colors duration-500">
-              Ready to build something unique?
-            </h2>
-
-            {/* Subtext */}
-            <p className="font-sans text-sm sm:text-lg text-milky-surface/85 dark:text-olive-primary/80 font-semibold leading-relaxed max-w-[500px] mb-10 transition-colors duration-500">
-              Currently accepting freelance projects and collaborations with design-forward agencies and startups.
-            </p>
-
-            {/* Contact & Resume Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <motion.a
-                href="mailto:venoxyarts@gmail.com"
-                whileHover={{ 
-                  y: -6, 
-                  scale: 1.04,
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="inline-flex items-center gap-3 bg-olive-primary dark:bg-matcha text-milky-surface hover:bg-[#858D5A] dark:hover:bg-matcha-hover font-display font-bold uppercase text-sm tracking-widest px-10 py-5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Mail className="w-5 h-5" />
-                Get in touch
-              </motion.a>
-
-              <motion.a
-                href="/CV-ATS-Updated.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ 
-                  y: -6, 
-                  scale: 1.04,
-                }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="inline-flex items-center gap-3 border-2 border-milky-surface dark:border-matcha text-milky-surface dark:text-matcha hover:bg-milky-surface dark:hover:bg-matcha hover:text-matcha dark:hover:text-milky-surface font-display font-bold uppercase text-sm tracking-widest px-10 py-[18px] rounded-xl transition-all duration-300 shadow-md"
-              >
-                <FileText className="w-5 h-5" />
-                View Resume
-              </motion.a>
-            </div>
-          </div>
+      <div 
+        className="w-full aspect-[16/9] relative flex items-center justify-center overflow-hidden bg-milky-surface"
+      >
+        {/* Layer 1: Background Desk */}
+        <motion.div style={{ y: yLayer1 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer1, translateY: yMouseLayer1 }} className="w-full h-full">
+            <img src="/assets/contact/layer-1.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
         </motion.div>
+
+        {/* Layer 2 */}
+        <motion.div style={{ y: yLayer2 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer2, translateY: yMouseLayer2 }} className="w-full h-full">
+            <img src="/assets/contact/layer-2.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 3 */}
+        <motion.div style={{ y: yLayer3 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer3, translateY: yMouseLayer3 }} className="w-full h-full">
+            <img src="/assets/contact/layer-3.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 4: Section Title ("SEND A NOTE" graphics) */}
+        <motion.div style={{ y: yLayer4 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer4, translateY: yMouseLayer4 }} className="w-full h-full">
+            <div className="w-full h-full contact-title-float">
+              <img src="/assets/contact/layer-4.png" alt="" className="w-full h-full object-cover" />
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 5 */}
+        <motion.div style={{ y: yLayer5 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer5, translateY: yMouseLayer5 }} className="w-full h-full">
+            <img src="/assets/contact/layer-5.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 6 */}
+        <motion.div style={{ y: yLayer6 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer6, translateY: yMouseLayer6 }} className="w-full h-full">
+            <img src="/assets/contact/layer-6.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
+        </motion.div>
+
+        {/* Layer 7: Accents/pins */}
+        <motion.div style={{ y: yLayer7 }} className="absolute inset-0 w-full h-full pointer-events-none">
+          <motion.div style={{ translateX: xLayer7, translateY: yMouseLayer7 }} className="w-full h-full">
+            <img src="/assets/contact/layer-7.png" alt="" className="w-full h-full object-cover" />
+          </motion.div>
+        </motion.div>
+
+        {/* Interactive Hotspot Overlay Layer - matches image cover aspect exactly */}
+        <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full max-w-[1920px] aspect-[16/9] max-h-[1080px] relative pointer-events-none md:pointer-events-auto flex-shrink-0">
+            
+            {/* CTA Button Link - Placed beautifully at bottom right corner beside socials and checklist with independent layered parallax */}
+            <motion.div
+              style={{ y: yCta }}
+              className="absolute top-[80%] left-[78%] w-[16%] h-[8%]"
+            >
+              <motion.a
+                href="mailto:josephvenedictillo@gmail.com"
+                style={{ translateX: xCta, translateY: yMouseCta }}
+                whileHover={{ 
+                  scale: 1.08, 
+                  rotate: -1.5,
+                  filter: "brightness(1.05) drop-shadow(0 10px 20px rgba(158,167,107,0.45))"
+                }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full h-full rounded-md cursor-pointer pointer-events-auto block"
+                title="Send Joseph Benedict a Note!"
+              >
+                <img src="/assets/contact/cta-button.png" alt="Send a Note CTA" className="w-full h-full object-contain filter drop-shadow-[2px_4px_3px_rgba(0,0,0,0.15)]" />
+              </motion.a>
+            </motion.div>
+
+            {/* Email Link Hotspot */}
+            <a
+              href="mailto:josephvenedictillo@gmail.com"
+              className="absolute top-[44%] left-[64.5%] w-[19%] h-[7%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"
+              title="Email josephvenedictillo@gmail.com"
+              aria-label="Email josephvenedictillo@gmail.com"
+            />
+
+            {/* Phone Link Hotspot */}
+            <a
+              href="tel:+639973487293"
+              className="absolute top-[51.5%] left-[64.5%] w-[15%] h-[7%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"
+              title="Call +63 997 348 7293"
+              aria-label="Phone Number +63 997 348 7293"
+            />
+
+            {/* LinkedIn Link Hotspot */}
+            <a
+              href="https://linkedin.com/in/joseph-venedict-tillo-322213398"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-[82%] left-[36.2%] w-[18.2%] h-[7.5%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"
+              title="Visit LinkedIn Profile"
+              aria-label="LinkedIn Profile"
+            />
+
+            {/* GitHub Link Hotspot */}
+            <a
+              href="https://github.com/SedictT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-[82%] left-[56.6%] w-[14.2%] h-[7.5%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"
+              title="Visit GitHub Profile"
+              aria-label="GitHub Profile"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

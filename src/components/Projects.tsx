@@ -2,8 +2,255 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue } from "framer-motion";
-import { ArrowUpRight, X, ArrowRight, ArrowUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowUpRight, X, ArrowRight, ArrowUp, ChevronLeft, ChevronRight, Maximize2, ZoomIn, ZoomOut, Heart } from "lucide-react";
 import { Tooltip } from "./Tooltip";
+import { Swanky_and_Moo_Moo } from "next/font/google";
+
+const swanky = Swanky_and_Moo_Moo({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Green Pushpin Component
+const Pushpin = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`absolute w-5 h-5 flex items-center justify-center select-none pointer-events-none z-20 ${className}`}
+  >
+    <div className="absolute w-4 h-4 rounded-full bg-black/30 blur-[2px] translate-x-1.5 translate-y-2" />
+    <div className="absolute w-3.5 h-3.5 rounded-full bg-emerald-500 border border-emerald-600 shadow-inner flex items-center justify-center">
+      <div className="absolute top-0.5 left-0.5 w-1 h-1 rounded-full bg-white/60" />
+      <div className="w-1.5 h-1.5 rounded-full bg-emerald-700/40" />
+    </div>
+    <div
+      className="absolute bottom-0 w-[2px] h-2 bg-[#5c5c5c]"
+      style={{ transform: "rotate(15deg) translateY(4px)" }}
+    />
+  </div>
+);
+
+// Green Smiley Sticker Component
+const SmileySticker = ({ className = "" }: { className?: string }) => (
+  <motion.div
+    whileHover={{ scale: 1.1, rotate: 5 }}
+    className={`absolute w-7 h-7 rounded-full bg-[#829c67] border border-[#5d7348] flex items-center justify-center shadow-md select-none pointer-events-auto z-10 ${className}`}
+  >
+    <svg
+      className="w-4 h-4 text-[#e6ecd8]"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2.5}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  </motion.div>
+);
+
+// CSS Tape Overlay
+const StickyTape = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`absolute w-14 h-5 bg-[#eae2b7]/40 border-l border-r border-[#cfc89e]/30 backdrop-blur-[0.5px] pointer-events-none select-none z-20 ${className}`}
+    style={{
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+      clipPath:
+        "polygon(0% 15%, 5% 0%, 95% 5%, 100% 12%, 98% 85%, 92% 100%, 8% 95%, 0% 80%)",
+    }}
+  />
+);
+
+// Paperclip Component
+const Paperclip = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`absolute w-5 h-10 select-none pointer-events-none z-20 ${className}`}
+    style={{ transform: "rotate(-10deg)" }}
+  >
+    <svg
+      viewBox="0 0 20 40"
+      fill="none"
+      className="w-full h-full drop-shadow-[2px_3px_1px_rgba(0,0,0,0.18)]"
+    >
+      <path
+        d="M3,12 V28 C3,33.5 7.5,38 13,38 C18.5,38 23,33.5 23,28 V8 C23,4 19.5,1 15,1 C10.5,1 7,4 7,8 V26 C7,29 9,31 12,31 C15,31 17,29 17,26 V12"
+        stroke="#df5353"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  </div>
+);
+
+// Ink Stamps
+const InkStamp = ({
+  label = "APPROVED",
+  className = "",
+  colorClass = "border-red-500/25 text-red-500/25",
+}: {
+  label?: string;
+  className?: string;
+  colorClass?: string;
+}) => (
+  <div
+    className={`absolute border-4 font-mono font-black text-[9px] sm:text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border-double rotate-[-12deg] select-none pointer-events-none ${colorClass} ${className}`}
+  >
+    {label}
+  </div>
+);
+
+// High-fidelity physical coffee stain ring
+const CoffeeStain = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`absolute w-32 h-32 rounded-full border-[3px] border-[#8b5a2b]/15 border-dashed pointer-events-none select-none z-10 ${className}`}
+    style={{
+      filter: "blur(0.8px)",
+      boxShadow: "inset 0 0 12px rgba(139, 90, 43, 0.05)",
+      transform: "rotate(35deg)",
+    }}
+  >
+    <div className="absolute inset-1.5 rounded-full border border-[#8b5a2b]/10 border-double" />
+    <div className="absolute top-1/4 -right-1 w-4 h-6 rounded-full bg-[#8b5a2b]/8 blur-[2px] rotate-12" />
+    <div className="absolute bottom-1/3 left-4 w-3 h-3 rounded-full bg-[#8b5a2b]/6 blur-[1.5px]" />
+  </div>
+);
+
+// Highly detailed mechanical yellow/green wooden pencil vector
+const RealisticPencil = ({ className = "" }: { className?: string }) => (
+  <motion.div
+    whileHover={{ rotate: -18, y: -2 }}
+    className={`absolute w-44 h-4 pointer-events-auto select-none z-30 cursor-grab active:cursor-grabbing ${className}`}
+    style={{
+      transform: "rotate(-15deg)",
+      filter: "drop-shadow(3px 4px 2px rgba(0,0,0,0.22))",
+    }}
+  >
+    <div className="absolute inset-0 bg-yellow-500 rounded-sm border-t border-yellow-400 border-b border-yellow-600 flex">
+      <div className="h-full w-full bg-gradient-to-y from-yellow-400 via-yellow-500 to-yellow-600 flex flex-col justify-between">
+        <div className="h-[1px] bg-yellow-300/40 w-full" />
+        <div className="h-[2px] bg-yellow-600/30 w-full" />
+        <div className="h-[1px] bg-yellow-300/40 w-full" />
+      </div>
+      <div className="w-6 h-full bg-gradient-to-r from-green-700 via-green-600 to-green-800 border-l border-zinc-700 shrink-0 flex items-center justify-around px-0.5">
+        <div className="w-[1px] h-full bg-yellow-300/40" />
+        <div className="w-[1px] h-full bg-yellow-300/40" />
+      </div>
+      <div className="w-4 h-full bg-gradient-to-r from-rose-400 via-rose-300 to-rose-500 rounded-r-sm shrink-0" />
+    </div>
+    <div
+      className="absolute -left-4 top-0 bottom-0 w-4 bg-[#e8c39e] border-l border-yellow-600"
+      style={{
+        clipPath: "polygon(100% 0%, 0% 50%, 100% 100%)",
+      }}
+    />
+    <div
+      className="absolute -left-4 top-1 bottom-1 w-1.5 bg-zinc-800"
+      style={{
+        clipPath: "polygon(100% 0%, 0% 50%, 100% 100%)",
+      }}
+    />
+  </motion.div>
+);
+
+// High-fidelity perforated Postage Stamp Component
+const PostageStamp = ({
+  className = "",
+  rotation = 5,
+  color = "#5d7348",
+  label = "5c",
+  icon,
+}: {
+  className?: string;
+  rotation?: number;
+  color?: string;
+  label?: string;
+  icon?: React.ReactNode;
+}) => (
+  <motion.div
+    initial={{ rotate: rotation }}
+    whileHover={{ scale: 1.12, rotate: rotation + 4, y: -4 }}
+    className={`absolute w-12 h-14 select-none pointer-events-auto z-10 flex items-center justify-center filter drop-shadow-[3px_4px_1px_rgba(43,43,42,0.22)] ${className}`}
+  >
+    <svg
+      viewBox="0 0 100 120"
+      className="absolute inset-0 w-full h-full"
+      fill="white"
+    >
+      <rect x="5" y="5" width="90" height="110" rx="2" fill="white" />
+      <circle cx="10" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="26" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="42" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="58" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="74" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="90" cy="5" r="4" fill="#cfbfa8" />
+      <circle cx="10" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="26" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="42" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="58" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="74" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="90" cy="115" r="4" fill="#cfbfa8" />
+      <circle cx="5" cy="20" r="4" fill="#cfbfa8" />
+      <circle cx="5" cy="40" r="4" fill="#cfbfa8" />
+      <circle cx="5" cy="60" r="4" fill="#cfbfa8" />
+      <circle cx="5" cy="80" r="4" fill="#cfbfa8" />
+      <circle cx="5" cy="100" r="4" fill="#cfbfa8" />
+      <circle cx="95" cy="20" r="4" fill="#cfbfa8" />
+      <circle cx="95" cy="40" r="4" fill="#cfbfa8" />
+      <circle cx="95" cy="60" r="4" fill="#cfbfa8" />
+      <circle cx="95" cy="80" r="4" fill="#cfbfa8" />
+      <circle cx="95" cy="100" r="4" fill="#cfbfa8" />
+    </svg>
+    <div className="absolute inset-0 p-2.5 flex flex-col justify-between pointer-events-none">
+      <div
+        className="w-full h-full flex flex-col justify-between p-1 rounded-sm text-white"
+        style={{ backgroundColor: color }}
+      >
+        <div className="flex justify-between items-start">
+          <span className="text-[5px] font-sans font-black tracking-tight leading-none uppercase">
+            PROJ
+          </span>
+          <span className="text-[6px] font-sans font-black leading-none">
+            {label}
+          </span>
+        </div>
+        <div className="flex-grow flex items-center justify-center my-0.5">
+          {icon}
+        </div>
+        <div className="text-center text-[4px] font-sans font-black tracking-wider leading-none">
+          CREATIVE
+        </div>
+      </div>
+    </div>
+  </motion.div>
+);
+
+// Pinned Star Sticker Component
+const StarSticker = ({
+  className = "",
+  rotation = 0,
+}: {
+  className?: string;
+  rotation?: number;
+}) => (
+  <motion.div
+    initial={{ rotate: rotation }}
+    whileHover={{ scale: 1.12, rotate: rotation + 5 }}
+    className={`absolute w-7 h-7 select-none pointer-events-auto z-10 ${className}`}
+    style={{
+      filter: "drop-shadow(2px 3px 1px rgba(43,43,42,0.18))",
+    }}
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="#f4d068"
+      className="w-full h-full stroke-[2px] stroke-[#2b2b2a]"
+    >
+      <path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.786 1.4 8.168L12 18.896l-7.334 3.857 1.4-8.168L.132 9.21l8.2-1.192z" />
+    </svg>
+  </motion.div>
+);
 
 interface Project {
   id: string;
@@ -79,6 +326,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
     setZoomScale(1);
     dragX.set(0);
     dragY.set(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lightboxImageIndex]);
 
   // Centering reset when zoomScale is reset to 1
@@ -87,6 +335,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
       dragX.set(0);
       dragY.set(0);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomScale]);
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -174,58 +423,146 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
 
   return (
-    <section id="projects" className="py-5 w-full">
-      <div className="max-w-[1100px] mx-auto px-6">
+    <section
+      id="projects"
+      ref={containerRef}
+      className="relative py-20 sm:py-28 w-full bg-milky transition-colors duration-500 overflow-visible"
+      style={{
+        backgroundImage: `
+          linear-gradient(color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px),
+          linear-gradient(90deg, color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px)
+        `,
+        backgroundSize: "28px 28px",
+      }}
+    >
+      {/* Background Ambience / Desk Elements */}
+      <CoffeeStain className="top-12 left-8 opacity-[0.45] scale-110 select-none pointer-events-none" />
+      <CoffeeStain className="bottom-24 right-12 opacity-[0.35] rotate-[120deg] scale-125 select-none pointer-events-none" />
+      
+      <RealisticPencil className="top-10 right-[15%] rotate-[-25deg] hidden lg:block opacity-[0.85] scale-95" />
+      
+      <div className="max-w-[1100px] mx-auto px-6 relative z-10">
         {/* Section Header */}
         <motion.div
-          className="flex flex-col items-center mb-16 text-center"
+          className="flex flex-col items-center mb-24 text-center relative"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
+          {/* Polaroid decoration pinned behind/next to the header */}
+          <SmileySticker className="-top-8 left-[15%] rotate-[-20deg] scale-125 hidden md:flex" />
+          <Pushpin className="-top-4 left-1/2 -translate-x-1/2 scale-125" />
+          <StickyTape className="-top-3 right-[20%] rotate-[15deg] w-20 hidden sm:block" />
+
           <img
             src="/Projects/projects-title.png"
             alt="Projects Title"
-            className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-none"
+            className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-none filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.18)]"
           />
         </motion.div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {projects.map((project) => (
-            <motion.div
-              key={project.id}
-              onClick={() => handleOpenModal(project)}
-              className="flex flex-col gap-5 cursor-pointer group"
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              whileHover={{ y: -8 }}
-              transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.1] }}
-            >
-              {/* Project Card Image Display */}
-              <div className="aspect-[16/10] w-full rounded-[40px] overflow-hidden border-[3px] border-matcha bg-milky-surface relative shadow-sm group-hover:shadow-[0_20px_40px_rgba(158,167,107,0.25)] group-hover:rotate-[-1deg] transition-all duration-500">
-                <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover object-top" />
-                <div className="absolute inset-0 bg-matcha/0 group-hover:bg-matcha/5 transition-colors duration-500" />
-              </div>
+        {/* Projects Grid of Physical Watercolor/Polaroid Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-x-12 md:gap-y-16">
+          {projects.map((project, index) => {
+            // Alternate rotations and physical clip elements for realistic desk sprawl
+            const baseRotation = index % 2 === 0 ? -1.8 : 1.5;
+            const hasTape = index % 3 === 0;
+            const hasPushpin = index % 3 === 1;
+            const hasPaperclip = index % 3 === 2;
 
-              {/* Project Info */}
-              <div className="flex justify-between items-start px-2">
-                <div>
-                  <h3 className="font-display font-bold text-2xl text-olive-primary mb-1">
-                    {project.title}
-                  </h3>
-                  <p className="text-olive-secondary font-semibold text-sm">
-                    {project.description}
-                  </p>
+            return (
+              <motion.div
+                key={project.id}
+                onClick={() => handleOpenModal(project)}
+                className="flex flex-col cursor-pointer group relative bg-[#faf9f5] border-2 border-[#2b2b2a] p-6 shadow-[6px_8px_2.5px_rgba(65,70,42,0.22)] hover:shadow-[12px_16px_5px_rgba(65,70,42,0.26)] transition-shadow duration-300"
+                initial={{ opacity: 0, y: 50, rotate: baseRotation }}
+                whileInView={{ opacity: 1, y: 0, rotate: baseRotation }}
+                viewport={{ once: true, margin: "-100px" }}
+                whileHover={{
+                  scale: 1.025,
+                  rotate: 0,
+                  y: -10,
+                  zIndex: 20,
+                }}
+                transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.1] }}
+                style={{ transformOrigin: "center" }}
+              >
+                {/* Physical Top Fasteners */}
+                {hasTape && <StickyTape className="-top-3 left-1/2 -translate-x-1/2 rotate-[-4deg] scale-110" />}
+                {hasPushpin && <Pushpin className="-top-4.5 left-1/2 -translate-x-1/2 scale-110" />}
+                {hasPaperclip && <Paperclip className="-top-5.5 left-8 rotate-[12deg] scale-125 z-30" />}
+
+                {/* Overlapping stamps on the Polaroid cards for visual flair */}
+                {index === 0 && (
+                  <InkStamp
+                    label="LATEST WORK"
+                    className="top-12 -right-3 rotate-[12deg] z-20"
+                    colorClass="border-red-500/30 text-red-500/30"
+                  />
+                )}
+                {index === 1 && (
+                  <InkStamp
+                    label="INTERACTIVE"
+                    className="top-10 -right-2 rotate-[-8deg] z-20"
+                    colorClass="border-emerald-600/35 text-emerald-600/35"
+                  />
+                )}
+                {index === 2 && (
+                  <InkStamp
+                    label="UI / UX BEST"
+                    className="top-14 -right-4 rotate-[15deg] z-20"
+                    colorClass="border-blue-600/30 text-blue-600/30"
+                  />
+                )}
+
+                {/* Polaroid Photo Frame */}
+                <div className="aspect-[16/10] w-full rounded-none overflow-hidden border-2 border-[#2b2b2a] bg-milky-surface relative shadow-sm transition-all duration-500">
+                  <img
+                    src={project.thumbnail}
+                    alt={project.title}
+                    className="w-full h-full object-cover object-top filter contrast-[1.02] brightness-[0.98]"
+                  />
+                  <div className="absolute inset-0 bg-[#8b5a2b]/0 group-hover:bg-[#8b5a2b]/5 transition-colors duration-500" />
+                  
+                  {/* Custom postage stamp badge inside card photo */}
+                  <PostageStamp
+                    className="bottom-3 right-3 scale-[0.65]"
+                    rotation={-10}
+                    color={index % 2 === 0 ? "#5d7348" : "#48829c"}
+                    label={project.year}
+                    icon={<Heart className="w-5 h-5 text-white fill-white" />}
+                  />
                 </div>
-                <div className="w-10 h-10 rounded-full border border-matcha/40 flex items-center justify-center text-olive-primary group-hover:bg-matcha group-hover:text-milky-surface group-hover:border-matcha transition-all duration-300">
-                  <ArrowUpRight className="w-5 h-5" />
+
+                {/* Polaroid Handwritten Style Content Bottom */}
+                <div className="flex justify-between items-end mt-6 pt-4 border-t border-dashed border-[#2b2b2a]/20">
+                  <div className="flex-grow select-text">
+                    <span className={`text-[13px] uppercase font-bold tracking-widest text-[#7a8155] block mb-1 ${swanky.className}`}>
+                      {project.role} • {project.year}
+                    </span>
+                    <h3 className="font-display font-black text-2xl text-[#2b2b2a] group-hover:text-matcha transition-colors duration-300">
+                      {project.title}
+                    </h3>
+                    <p className={`text-olive-secondary font-medium text-[15px] mt-1.5 leading-snug max-w-[90%] ${swanky.className}`}>
+                      {project.description}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 shrink-0 rounded-full border-2 border-[#2b2b2a] flex items-center justify-center text-[#2b2b2a] group-hover:bg-matcha group-hover:text-white group-hover:scale-105 transition-all duration-300 shadow-[2px_2px_0px_0px_rgba(43,43,42,1)] bg-[#faf9f5]">
+                    <ArrowUpRight className="w-5 h-5" />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+
+                {/* Star Sticker overlapping some of the cards randomly */}
+                {index % 2 === 0 && (
+                  <StarSticker className="-bottom-3.5 -left-3 rotate-[-15deg] scale-95" />
+                )}
+                {index === 1 && (
+                  <SmileySticker className="-bottom-4 -right-3 rotate-[12deg] scale-110" />
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
