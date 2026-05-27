@@ -204,7 +204,7 @@ export default function Contact() {
 
             {/* GitHub Link Hotspot */}
             <a
-              href="https://github.com/SedictT"
+              href="https://github.com/Sedictt"
               target="_blank"
               rel="noopener noreferrer"
               className="absolute top-[82%] left-[56.6%] w-[14.2%] h-[7.5%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"

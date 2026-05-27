@@ -458,7 +458,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           <img
             src="/Projects/projects-title.png"
             alt="Projects Title"
-            className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-none filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.18)]"
+            className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-auto filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.18)] transition-transform duration-300 hover:scale-[1.03]"
           />
         </motion.div>
 
@@ -983,9 +983,9 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
               <div
                 ref={!longImages[selectedProject.images[lightboxImageIndex]] ? containerRef : undefined}
                 onWheel={!longImages[selectedProject.images[lightboxImageIndex]] ? handleWheel : undefined}
-                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 overflow-hidden ${longImages[selectedProject.images[lightboxImageIndex]]
+                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 ${longImages[selectedProject.images[lightboxImageIndex]]
                   ? "overflow-y-auto w-full max-w-[850px] aspect-[10/16] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar"
-                  : "flex items-center justify-center rounded-lg bg-black/20"
+                  : `flex items-center justify-center rounded-lg bg-black/20 ${zoomScale > 1 ? "overflow-visible" : "overflow-hidden"}`
                   }`}
               >
                 <motion.img

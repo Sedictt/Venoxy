@@ -464,7 +464,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
                 <div 
                   ref={containerRef}
                   onWheel={handleWheel}
-                  className="relative w-full max-w-[90%] max-h-[46vh] md:max-h-[58vh] flex items-center justify-center overflow-hidden rounded-xl bg-black/20"
+                  className={`relative w-full max-w-[90%] max-h-[46vh] md:max-h-[58vh] flex items-center justify-center rounded-xl bg-black/20 ${zoomScale > 1 ? "overflow-visible" : "overflow-hidden"}`}
                 >
                   <AnimatePresence mode="wait">
                     <motion.img

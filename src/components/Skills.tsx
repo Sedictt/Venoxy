@@ -352,7 +352,7 @@ const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDiv
   const parallaxY = useTransform(scrollYProgress, [0, 1], [60, -60]);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-[9999] select-none">
+    <div className="absolute inset-0 pointer-events-none z-35 select-none">
       <motion.div style={{ y: parallaxY }}>
         <motion.img
           src="/assets/skills & tools/paper_plane.png"
