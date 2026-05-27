@@ -180,7 +180,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
   const tabs: { id: "all" | "photography" | "design" | "traditional" | "digital" | "others"; label: string }[] = [
     { id: "all", label: "All Works" },
     { id: "photography", label: "Photography" },
-    { id: "design", label: "Graphic Design" },
+    { id: "design", label: "Graphics Design" },
     { id: "traditional", label: "Traditional Art" },
     { id: "digital", label: "Digital Art" },
     { id: "others", label: "Others" }
@@ -565,7 +565,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
                   {/* Category Pill Tag */}
                   <span className="inline-block bg-matcha text-milky-surface text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-sm mb-3">
                     {filteredItems[lightboxIndex].category === "photography" ? "Camera Photograph" : 
-                     filteredItems[lightboxIndex].category === "design" ? "Graphic Design" :
+                     filteredItems[lightboxIndex].category === "design" ? "Graphics Design" :
                      filteredItems[lightboxIndex].category === "traditional" ? "Traditional Art" :
                      filteredItems[lightboxIndex].category === "digital" ? "Digital Painting" : "Others"}
                   </span>

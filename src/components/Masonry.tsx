@@ -284,7 +284,7 @@ const Masonry = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-5 text-white transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 pointer-events-auto">
                 <span className="inline-block bg-matcha text-milky-surface text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm mb-2.5 self-start shadow-sm">
                   {item.category === "photography" ? "Photography" : 
-                   item.category === "design" ? "Graphic Design" :
+                   item.category === "design" ? "Graphics Design" :
                    item.category === "traditional" ? "Traditional Art" :
                    item.category === "digital" ? "Digital Art" : "Others"}
                 </span>
