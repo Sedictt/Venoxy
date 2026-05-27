@@ -184,12 +184,11 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <span className="inline-block bg-matcha text-milky-surface text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-sm mb-4">
-            Selected Works
-          </span>
-          <h2 className="font-display font-bold text-4xl sm:text-6xl text-olive-primary tracking-tight">
-            Portfolio
-          </h2>
+          <img 
+            src="/Projects/projects-title.png" 
+            alt="Projects Title" 
+            className="w-auto h-24 sm:h-32 md:h-40 object-contain select-none pointer-events-none" 
+          />
         </motion.div>
 
         {/* Projects Grid */}
