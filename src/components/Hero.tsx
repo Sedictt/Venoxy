@@ -55,12 +55,7 @@ export default function Hero({ loaderCompleted }: HeroProps) {
         <img 
           src="/hero_image.png" 
           alt="Hero Background" 
-          className="w-full h-full object-cover opacity-100 dark:hidden" 
-        />
-        <img 
-          src="/dark_hero_image.png" 
-          alt="Hero Background Dark" 
-          className="w-full h-full object-cover opacity-100 hidden dark:block" 
+          className="w-full h-full object-cover opacity-100" 
         />
       </div>
 

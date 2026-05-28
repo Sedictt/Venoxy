@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-matcha: var(--theme-matcha);
   --color-matcha-hover: var(--theme-matcha-hover);
@@ -31,6 +33,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --theme-matcha: #9EA76B;
     --theme-matcha-hover: #858D5A;
     --theme-milky: #EFE8CA;
