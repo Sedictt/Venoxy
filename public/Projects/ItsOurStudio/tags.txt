@@ -1,0 +1,1 @@
+Next.js, React, Framer Motion, GSAP, TypeScript, Supabase, Tailwind CSS
