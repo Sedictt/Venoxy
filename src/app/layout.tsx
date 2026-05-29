@@ -14,6 +14,16 @@ export const metadata: Metadata = {
   description: "Independent creative web developer crafting premium, high-fidelity digital experiences with precision, modern frontend technologies, and beautiful physics-based animations.",
   keywords: ["Venoxy", "Venoxy Arts", "Creative Web Developer", "Frontend Developer", "Next.js", "Tailwind CSS", "GSAP Animations", "Framer Motion"],
   authors: [{ name: "Venoxy" }],
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     title: "Venoxy Arts — Creative Web Developer Portfolio",
     description: "Independent creative web developer crafting premium, high-fidelity digital experiences.",
