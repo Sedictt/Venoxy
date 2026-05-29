@@ -54,11 +54,8 @@ body {
   overflow-x: hidden;
 }
 
-.is-scrolling .group:hover img,
-.is-scrolling .group:hover svg,
-.is-scrolling .group:hover div,
-.is-scrolling .group:hover span {
-  transition-duration: 0ms !important;
+.is-scrolling * {
+  pointer-events: none !important;
 }
 
 ::selection {
@@ -107,6 +104,14 @@ html.lenis, html.lenis body {
   opacity: 0 !important;
   pointer-events: none !important;
   transform: translateY(-20px) !important;
+}
+
+/* Fix footer appearing over modal when modal is open */
+.modal-open footer {
+  z-index: 0 !important;
+}
+.modal-open main {
+  z-index: 9999 !important;
 }
 
 /* Custom scrollbar for scrollable lightbox image (long screenshot) */

@@ -8,7 +8,8 @@ import { Tooltip } from "./Tooltip";
 
 const navLinks = [
   { id: "hero", label: "About" },
-  { id: "projects", label: "Project" },
+  { id: "skills", label: "Skills" },
+  { id: "projects", label: "Projects" },
   { id: "contact", label: "Contact" }
 ];
 
@@ -21,41 +22,44 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
+
+      // Determine active section based on scroll position / offset from top
+      const scrollPosition = window.scrollY + 160; // Offset for navbar height and visual spacing
+
+      // Find the section that currently matches the scroll position
+      let currentSection = "";
+      for (const link of navLinks) {
+        const section = document.getElementById(link.id);
+        if (section) {
+          const top = section.offsetTop;
+          const height = section.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            currentSection = link.id;
+          }
+        }
+      }
+
+      // Fallback: If scrolled close to top, default to "hero"
+      if (window.scrollY < 80) {
+        currentSection = "hero";
+      }
+      
+      // Fallback: If scrolled to bottom, default to last section ("contact")
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
+        currentSection = "contact";
+      }
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
     };
+
+    // Run once on mount to set initial state
+    handleScroll();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
-    const observerOptions = {
-      root: null,
-      rootMargin: "-20% 0px -60% 0px", // Focus on sections in the center-top
-      threshold: 0.1,
-    };
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, observerOptions);
-    
-    // Observe sections
-    navLinks.forEach((link) => {
-      const section = document.getElementById(link.id);
-      if (section) observer.observe(section);
-    });
-
-    // Also observe hero to deactivate when scrolled to top
-    const heroSection = document.getElementById("hero");
-    if (heroSection) {
-      observer.observe(heroSection);
-    }
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      observer.disconnect();
     };
   }, []);
 

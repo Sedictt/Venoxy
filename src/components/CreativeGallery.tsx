@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue } from "framer-motion";
-import { ArrowLeft, ChevronLeft, ChevronRight, X, Maximize2, Camera, Info, Laptop, Palette, Sparkles, Layers, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, X, Maximize2, Camera, Info, Laptop, Palette, Sparkles, Layers, ZoomIn, ZoomOut, LayoutGrid } from "lucide-react";
 import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
 import Masonry from "./Masonry";
 
@@ -31,6 +31,8 @@ const tabIcons = {
   digital: Layers,
   others: Info
 };
+
+
 
 const preloadedImages = new Set<string>();
 
@@ -125,13 +127,16 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
     if (lightboxIndex !== null) {
       document.body.style.overflow = "hidden";
       document.documentElement.classList.add("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "stop" }));
     } else {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "start" }));
     }
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "start" }));
     };
   }, [lightboxIndex]);
 
@@ -186,38 +191,6 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
     { id: "others", label: "Others" }
   ];
 
-  // Technical specs generator for immersive viewer experience
-  const getTechnicalSpecs = (item: CreativeItem) => {
-    if (item.category === "photography") {
-      return [
-        { label: "Device", value: "Fujifilm X-T4 Camera", icon: Camera },
-        { label: "Lens Spec", value: "XF 35mm f/1.4 R Prime", icon: Info },
-        { label: "Exposure", value: "f/2.8 • 1/200s • ISO 160", icon: Info },
-        { label: "Process", value: "Original Analog Tone Scan", icon: Info }
-      ];
-    } else if (item.category === "design") {
-      return [
-        { label: "Tool", value: "Adobe Illustrator CC", icon: Laptop },
-        { label: "Pipeline", value: "Figma vector styling engine", icon: Info },
-        { label: "Canvas", value: "3840 x 2160 pixels", icon: Info },
-        { label: "Format", value: "High Fidelity SVGs", icon: Info }
-      ];
-    } else if (item.category === "digital") {
-      return [
-        { label: "Hardware", value: "Wacom Cintiq Pro 24", icon: Laptop },
-        { label: "Software", value: "Procreate & Photoshop CC", icon: Info },
-        { label: "Canvas", value: "4000 x 3000 at 300 DPI", icon: Info },
-        { label: "Color Profile", value: "Display P3 Gamut", icon: Info }
-      ];
-    } else {
-      return [
-        { label: "Medium", value: "Acrylic & Gouache Paint", icon: Palette },
-        { label: "Surface", value: "Heavyweight 300gsm Cotton", icon: Info },
-        { label: "Capture", value: "Epson V850 Pro Flatbed", icon: Info },
-        { label: "Aesthetic", value: "Physical Impasto Texture", icon: Info }
-      ];
-    }
-  };
 
   // Helper to count items in each category
   const getTabCount = (tabId: typeof tabs[number]["id"]) => {
@@ -254,12 +227,59 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
   }, [baseItems]);
 
   return (
-    <section className="pt-16 pb-24 min-h-screen w-full bg-milky relative transition-colors duration-500">
-      <div className="max-w-[1100px] mx-auto px-6">
+    <section className="pt-10 pb-24 min-h-screen w-full bg-milky relative transition-colors duration-500 overflow-hidden">
+      {/* Decorative High-Fidelity Chalk Doodles in the background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.24] sm:opacity-[0.32] mix-blend-multiply">
+        {/* Left Margin Chalk Art */}
+        <img 
+          src="/assets/chalk/paperplane.png" 
+          alt="Chalk Paper Plane" 
+          className="absolute top-[8%] left-[-1%] w-20 sm:w-28 h-auto rotate-[-12deg]"
+        />
+        <img 
+          src="/assets/chalk/star.png" 
+          alt="Chalk Star" 
+          className="absolute top-[32%] left-[4%] w-10 sm:w-14 h-auto rotate-[20deg]"
+        />
+        <img 
+          src="/assets/chalk/camera.png" 
+          alt="Chalk Camera" 
+          className="absolute bottom-[28%] left-[-4%] w-44 sm:w-[260px] md:w-[350px] h-auto rotate-[-10deg]"
+        />
+        <img 
+          src="/assets/chalk/swirl.png" 
+          alt="Chalk Swirl" 
+          className="absolute bottom-[8%] left-[5%] w-18 sm:w-24 h-auto rotate-[15deg]"
+        />
+
+        {/* Right Margin Chalk Art */}
+        <img 
+          src="/assets/chalk/threesparkle.png" 
+          alt="Chalk Sparkles" 
+          className="absolute top-[12%] right-[3%] w-12 sm:w-18 h-auto rotate-[15deg]"
+        />
+        <img 
+          src="/assets/chalk/cloud.png" 
+          alt="Chalk Cloud" 
+          className="absolute top-[28%] right-[-6%] w-48 sm:w-[300px] md:w-[420px] h-auto rotate-[-8deg]"
+        />
+        <img 
+          src="/assets/chalk/frog.png" 
+          alt="Chalk Frog" 
+          className="absolute bottom-[35%] right-[-2%] w-28 sm:w-[160px] md:w-[200px] h-auto rotate-[10deg]"
+        />
+        <img 
+          src="/assets/chalk/arrow.png" 
+          alt="Chalk Arrow" 
+          className="absolute bottom-[10%] right-[4%] w-14 sm:w-20 h-auto rotate-[40deg]"
+        />
+      </div>
+
+      <div className="max-w-[1100px] mx-auto px-6 relative z-10">
         {/* Header / Nav Section */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12 border-b border-matcha/20 pb-8">
-          {/* Left Column: Navigation link & Page title */}
-          <div className="flex flex-col items-start gap-4">
+        <div className="flex flex-col gap-6 mb-6 border-b border-matcha/20 pb-4 w-full">
+          {/* Back button */}
+          <div className="flex flex-col items-start">
             <Link 
               href="/"
               className="inline-flex items-center gap-2 text-olive-secondary hover:text-matcha font-bold text-sm uppercase tracking-widest group transition-colors duration-300"
@@ -267,27 +287,20 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
               <ArrowLeft className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1.5" />
               Back to Home
             </Link>
-            
-            <div className="flex flex-col">
-              <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                <span className="inline-block bg-matcha text-milky-surface text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-sm">
-                  Creative Outlet
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-olive-secondary bg-milky-surface/80 border border-matcha/25 px-2.5 py-0.5 rounded-full shadow-sm">
-                  {baseItems.length} curated pieces
-                </span>
-              </div>
-              <h1 className="font-display font-bold text-4xl sm:text-5xl text-olive-primary tracking-tight">
-                Arts & Visuals
-              </h1>
-              <p className="text-olive-secondary text-sm font-semibold mt-2.5 max-w-[480px] leading-relaxed">
-                A dynamic showcase of visual creations, professional photograph captures, graphic prototypes, and canvas arts styled by Venoxy.
-              </p>
-            </div>
           </div>
 
-          {/* Right Column: Tab Switcher (Stretches to fill container with zero negative space) */}
-          <div className="relative w-full lg:max-w-[650px] overflow-hidden select-none self-start lg:self-end">
+          <div className="flex flex-col items-center text-center mt-4">
+            <img
+              src="/assets/gallery/gallery-header.png"
+              alt="Gallery Header"
+              className="w-auto h-16 sm:h-36 md:h-44 object-contain select-none pointer-events-auto filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.18)] transition-transform duration-300 hover:scale-[1.03]"
+            />
+          </div>
+        </div>
+
+        {/* Full-width Filter Row */}
+        <div className="w-full mb-8 select-none">
+          <div className="relative w-full overflow-hidden">
             {/* Left Edge Overlay indicator */}
             <div 
               className={`absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-milky to-transparent z-20 pointer-events-none transition-opacity duration-300 ${
@@ -299,53 +312,35 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
               ref={tabsRef}
               className="w-full overflow-x-auto scrollbar-none pb-2 -mb-2"
             >
-              <div className="flex border border-matcha/20 bg-milky-surface/80 backdrop-blur-md rounded-full p-1.5 shadow-[0_4px_12px_rgba(65,70,42,0.03)] w-full min-w-full">
+              <div className="flex flex-wrap items-center gap-3.5 w-full py-1">
                 {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
-                  const TabIcon = tabIcons[tab.id];
                   return (
-                    <motion.button
-                      layout
+                    <button
                       key={tab.id}
                       onClick={() => {
                         setActiveTab(tab.id);
                         setLightboxIndex(null);
                       }}
-                      className={`relative px-3 py-3 rounded-full text-[11px] font-bold uppercase tracking-wider cursor-pointer z-10 transition-all duration-300 flex items-center justify-center gap-2.5 shrink-0 flex-1 ${
-                        isActive ? "text-milky-surface" : "text-olive-secondary hover:text-olive-primary"
+                      className={`relative shrink-0 rounded-full px-5 py-2.5 text-[11px] font-extrabold uppercase tracking-widest cursor-pointer transition-all duration-300 flex items-center gap-2 border-2 ${
+                        isActive 
+                          ? "bg-[#4d5d36] border-[#4d5d36] text-milky shadow-[2px_3px_0px_0px_rgba(65,70,42,1)] hover:scale-[1.02]" 
+                          : "border-[#41462a]/60 text-olive-secondary bg-transparent hover:bg-[#41462a]/5 hover:text-olive-primary hover:border-[#41462a] hover:scale-[1.02]"
                       }`}
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     >
-                      {isActive && (
-                        <motion.div
-                          layoutId="activeFilterBg"
-                          className="absolute inset-0 bg-matcha rounded-full -z-10 shadow-[0_4px_12px_rgba(158,167,107,0.3)]"
-                          transition={{ type: "spring", stiffness: 350, damping: 26 }}
-                        />
+                      {/* Grid/Layout icon for 'All Works' tab */}
+                      {tab.id === "all" && (
+                        <LayoutGrid className="w-3.5 h-3.5 shrink-0" />
                       )}
                       
-                      <TabIcon className="w-4 h-4 shrink-0" />
+                      <span>{tab.label}</span>
                       
-                      <AnimatePresence mode="popLayout" initial={false}>
-                        {isActive && (
-                          <motion.span
-                            initial={{ width: 0, opacity: 0 }}
-                            animate={{ width: "auto", opacity: 1 }}
-                            exit={{ width: 0, opacity: 0 }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                            className="overflow-hidden whitespace-nowrap block"
-                          >
-                            {tab.label}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                      
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold transition-all duration-300 ${
-                        isActive ? "bg-milky-surface/20 text-milky-surface" : "bg-matcha/10 text-matcha"
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-extrabold transition-all duration-300 ${
+                        isActive ? "bg-milky/20 text-milky" : "bg-matcha/10 text-matcha"
                       }`}>
                         {getTabCount(tab.id)}
                       </span>
-                    </motion.button>
+                    </button>
                   );
                 })}
               </div>
@@ -559,7 +554,7 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
                 </button>
               </div>
 
-              {/* Right Column: Immersive Tech Specs & Description drawer */}
+              {/* Right Column: Description drawer */}
               <div className="bg-white/[0.03] border border-white/10 rounded-[24px] p-6 text-white w-full max-h-[85vh] md:h-auto md:max-h-full overflow-y-auto backdrop-blur-md shadow-2xl flex flex-col justify-between gap-5">
                 <div>
                   {/* Category Pill Tag */}
@@ -570,43 +565,15 @@ export default function CreativeGallery({ initialItems = [] }: CreativeGalleryPr
                      filteredItems[lightboxIndex].category === "digital" ? "Digital Painting" : "Others"}
                   </span>
                   
-                  {/* Title & Static Label */}
-                  <h4 className="font-display font-bold text-2xl sm:text-3xl tracking-tight leading-tight text-white mb-1.5">
+                  {/* Title */}
+                  <h4 className="font-display font-bold text-2xl sm:text-3xl tracking-tight leading-tight text-white mb-4">
                     {filteredItems[lightboxIndex].title}
                   </h4>
                   
-                  <span className="inline-flex items-center gap-1.5 text-xs text-white/40 font-semibold mb-5">
-                    <Info className="w-3.5 h-3.5 text-matcha" />
-                    Asset details and dimensions
-                  </span>
-
-                  {/* Technical Metadata Specs Grid */}
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3.5 my-4 border-t border-b border-white/10 py-4.5">
-                    {getTechnicalSpecs(filteredItems[lightboxIndex]).map((spec, specIdx) => {
-                      const SpecIcon = spec.icon;
-                      return (
-                        <div key={specIdx} className="flex flex-col gap-0.5">
-                          <span className="text-[9px] text-white/35 uppercase font-bold tracking-widest flex items-center gap-1.5">
-                            <SpecIcon className="w-3 h-3 text-matcha" />
-                            {spec.label}
-                          </span>
-                          <span className="text-xs sm:text-sm font-semibold text-white/80 leading-snug">
-                            {spec.value}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
                   {/* Curated Paragraph Description */}
-                  <div className="my-2.5">
-                    <span className="text-[9px] text-white/35 uppercase font-bold tracking-widest block mb-1">
-                      Creative Commentary
-                    </span>
-                    <p className="text-white/70 text-xs sm:text-sm leading-relaxed font-semibold">
-                      {filteredItems[lightboxIndex].description}
-                    </p>
-                  </div>
+                  <p className="text-white/70 text-sm sm:text-base leading-relaxed font-medium">
+                    {filteredItems[lightboxIndex].description}
+                  </p>
                 </div>
 
                 {/* Info Panel Footer */}

@@ -310,13 +310,16 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
     if (selectedProject) {
       document.body.style.overflow = "hidden";
       document.documentElement.classList.add("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "stop" }));
     } else {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "start" }));
     }
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("modal-open");
+      window.dispatchEvent(new CustomEvent("toggle-lenis", { detail: "start" }));
     };
   }, [selectedProject]);
 
@@ -435,11 +438,33 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
         backgroundSize: "28px 28px",
       }}
     >
+      {/* Decorative High-Fidelity Chalk Doodles in the background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.24] sm:opacity-[0.32] mix-blend-multiply">
+        <img 
+          src="/assets/chalk/cloud.png" 
+          alt="" 
+          className="absolute top-[6%] right-[-6%] w-[260px] sm:w-[350px] h-auto rotate-[-8deg]"
+        />
+        <img 
+          src="/assets/chalk/swirl.png" 
+          alt="" 
+          className="absolute top-[18%] left-[2%] w-20 sm:w-28 h-auto rotate-[10deg]"
+        />
+        <img 
+          src="/assets/chalk/star.png" 
+          alt="" 
+          className="absolute bottom-[35%] left-[4%] w-10 sm:w-14 h-auto rotate-[-15deg]"
+        />
+        <img 
+          src="/assets/chalk/frog.png" 
+          alt="" 
+          className="absolute bottom-[18%] right-[-5%] w-[200px] sm:w-[260px] h-auto rotate-[15deg]"
+        />
+      </div>
+
       {/* Background Ambience / Desk Elements */}
       <CoffeeStain className="top-12 left-8 opacity-[0.45] scale-110 select-none pointer-events-none" />
       <CoffeeStain className="bottom-24 right-12 opacity-[0.35] rotate-[120deg] scale-125 select-none pointer-events-none" />
-      
-      <RealisticPencil className="top-10 right-[15%] rotate-[-25deg] hidden lg:block opacity-[0.85] scale-95" />
       
       <div className="max-w-[1100px] mx-auto px-6 relative z-10">
         {/* Section Header */}
@@ -450,10 +475,6 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          {/* Polaroid decoration pinned behind/next to the header */}
-          <SmileySticker className="-top-8 left-[15%] rotate-[-20deg] scale-125 hidden md:flex" />
-          <Pushpin className="-top-4 left-1/2 -translate-x-1/2 scale-125" />
-          <StickyTape className="-top-3 right-[20%] rotate-[15deg] w-20 hidden sm:block" />
 
           <img
             src="/Projects/projects-title.png"
@@ -486,7 +507,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   zIndex: 20,
                 }}
                 transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.1] }}
-                style={{ transformOrigin: "center" }}
+                style={{ transformOrigin: "center", willChange: "transform" }}
               >
                 {/* Physical Top Fasteners */}
                 {hasTape && <StickyTape className="-top-3 left-1/2 -translate-x-1/2 rotate-[-4deg] scale-110" />}
@@ -902,10 +923,8 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
                   <div className="w-full flex flex-col sm:flex-row gap-6 justify-between items-center text-xs text-olive-secondary border-t border-matcha/10 pt-8">
                     <div className="flex gap-6">
-                      <a href="#" className="hover:text-matcha font-bold">Twitter</a>
                       <a href="#" className="hover:text-matcha font-bold">LinkedIn</a>
                       <a href="#" className="hover:text-matcha font-bold">GitHub</a>
-                      <a href="#" className="hover:text-matcha font-bold">Instagram</a>
                     </div>
                     <div className="text-center sm:text-right">
                       <p>&copy; 2026 Venoxy. All rights reserved.</p>

@@ -315,20 +315,12 @@ const Sticker = ({
       {pinPos === "top" && (
         <Pushpin className="-top-3.5 left-1/2 -translate-x-1/2 scale-110" />
       )}
+
       <div
-        className="w-full flex-grow flex items-center justify-center min-h-0"
+        className="w-full flex-grow flex items-center justify-center min-h-0 will-change-transform"
         style={{
-          filter: `
-            drop-shadow(2.5px 0 0 #ffffff)
-            drop-shadow(-2.5px 0 0 #ffffff)
-            drop-shadow(0 2.5px 0 #ffffff)
-            drop-shadow(0 -2.5px 0 #ffffff)
-            drop-shadow(1.8px 1.8px 0 #ffffff)
-            drop-shadow(-1.8px -1.8px 0 #ffffff)
-            drop-shadow(1.8px -1.8px 0 #ffffff)
-            drop-shadow(-1.8px 1.8px 0 #ffffff)
-            drop-shadow(4px 5px 1px rgba(43,43,42,0.22))
-          `,
+          filter: "url(#sticker-outline-filter)",
+          transform: "translate3d(0, 0, 0)",
         }}
       >
         {children}
@@ -353,7 +345,7 @@ const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDiv
 
   return (
     <div className="absolute inset-0 pointer-events-none z-35 select-none">
-      <motion.div style={{ y: parallaxY }}>
+      <motion.div style={{ y: parallaxY, willChange: "transform" }}>
         <motion.img
           src="/assets/skills & tools/paper_plane.png"
           alt=""
@@ -374,6 +366,8 @@ const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDiv
             bottom: -260,
             width: 950,
             filter: "blur(6px)",
+            willChange: "transform",
+            transform: "translate3d(0,0,0)",
           }}
         />
       </motion.div>
@@ -397,6 +391,47 @@ export default function Skills() {
         backgroundSize: "28px 28px",
       }}
     >
+      {/* Hardware-accelerated SVG filter for premium sticker white border and shadow */}
+      <svg width="0" height="0" className="absolute pointer-events-none">
+        <defs>
+          <filter id="sticker-outline-filter" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2.5" />
+            <feFlood floodColor="#ffffff" floodOpacity="1" result="FLOOD" />
+            <feComposite in="FLOOD" in2="DILATED" operator="in" result="OUTLINE" />
+            <feDropShadow in="OUTLINE" dx="4" dy="5" stdDeviation="0.5" floodColor="#2b2b2a" floodOpacity="0.22" result="SHADOW" />
+            <feMerge>
+              <feMergeNode in="SHADOW" />
+              <feMergeNode in="OUTLINE" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+      </svg>
+
+      {/* Decorative High-Fidelity Chalk Doodles in the background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.24] sm:opacity-[0.32] mix-blend-multiply">
+        <img 
+          src="/assets/chalk/cloud.png" 
+          alt="" 
+          className="absolute top-[18%] right-[-8%] w-[260px] sm:w-[380px] h-auto rotate-[-8deg]"
+        />
+        <img 
+          src="/assets/chalk/paperplane.png" 
+          alt="" 
+          className="absolute top-[32%] left-[4%] w-20 sm:w-28 h-auto rotate-[-12deg]"
+        />
+        <img 
+          src="/assets/chalk/star.png" 
+          alt="" 
+          className="absolute bottom-[18%] right-[5%] w-12 sm:w-16 h-auto rotate-[15deg]"
+        />
+        <img 
+          src="/assets/chalk/camera.png" 
+          alt="" 
+          className="absolute bottom-[8%] left-[-4%] w-[220px] sm:w-[320px] h-auto rotate-[-15deg]"
+        />
+      </div>
+
       {/* Realistic blurred Polaroid paper plane flying in the foreground */}
       <BlurredPaperPlane sectionRef={containerRef} />
 
@@ -404,9 +439,6 @@ export default function Skills() {
       <CoffeeStain className="bottom-12 left-10 opacity-[0.55] scale-110 sm:scale-125" />
       <CoffeeStain className="top-14 right-[8%] opacity-[0.4] rotate-[130deg] scale-90 sm:scale-100" />
 
-      {/* Mechanical yellow/green wooden pencils resting casually on the background desk */}
-      <RealisticPencil className="bottom-14 right-[16%] rotate-[-22deg] hidden md:block scale-110" />
-      <RealisticPencil className="top-8 left-[6%] rotate-[35deg] hidden lg:block scale-95 opacity-[0.85]" />
 
       {/* Header Image for Title */}
       <div className="relative max-w-4xl mx-auto flex flex-col items-center justify-center mb-10 sm:mb-14 px-4 select-none pointer-events-none">
