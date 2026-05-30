@@ -194,7 +194,7 @@ export default function Contact() {
 
             {/* LinkedIn Link Hotspot */}
             <a
-              href="https://linkedin.com/in/joseph-venedict-tillo-322213398"
+              href="https://linkedin.com/in/joseph-venedict-tillo-232231398"
               target="_blank"
               rel="noopener noreferrer"
               className="absolute top-[82%] left-[36.2%] w-[18.2%] h-[7.5%] rounded-md cursor-pointer hover:bg-matcha/10 border border-transparent hover:border-matcha/30 transition-all duration-200 pointer-events-auto"

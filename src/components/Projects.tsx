@@ -923,8 +923,8 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
                   <div className="w-full flex flex-col sm:flex-row gap-6 justify-between items-center text-xs text-olive-secondary border-t border-matcha/10 pt-8">
                     <div className="flex gap-6">
-                      <a href="#" className="hover:text-matcha font-bold">LinkedIn</a>
-                      <a href="#" className="hover:text-matcha font-bold">GitHub</a>
+                      <a href="https://linkedin.com/in/joseph-venedict-tillo-232231398" target="_blank" rel="noopener noreferrer" className="hover:text-matcha font-bold">LinkedIn</a>
+                      <a href="https://github.com/Sedictt" target="_blank" rel="noopener noreferrer" className="hover:text-matcha font-bold">GitHub</a>
                     </div>
                     <div className="text-center sm:text-right">
                       <p>&copy; 2026 Venoxy. All rights reserved.</p>
