@@ -54,8 +54,22 @@ body {
   overflow-x: hidden;
 }
 
-.is-scrolling * {
+/* Scoped to interactive elements only — avoids full-DOM style recalc on scroll start/end */
+.is-scrolling a,
+.is-scrolling button,
+.is-scrolling [role="button"],
+.is-scrolling input,
+.is-scrolling textarea,
+.is-scrolling select {
   pointer-events: none !important;
+}
+
+/* Let the browser skip rendering off-screen sections for major FPS gains */
+#skills,
+#projects,
+#contact {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
 }
 
 ::selection {

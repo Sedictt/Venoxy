@@ -18,48 +18,38 @@ export default function Navbar() {
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
 
-  // Monitor scroll for nav transform and active section highlights
+  // Monitor scroll for nav transform; use IntersectionObserver for active section
+  // to avoid forced layout reflow from reading offsetTop/offsetHeight on every scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
-
-      // Determine active section based on scroll position / offset from top
-      const scrollPosition = window.scrollY + 160; // Offset for navbar height and visual spacing
-
-      // Find the section that currently matches the scroll position
-      let currentSection = "";
-      for (const link of navLinks) {
-        const section = document.getElementById(link.id);
-        if (section) {
-          const top = section.offsetTop;
-          const height = section.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            currentSection = link.id;
-          }
-        }
-      }
-
-      // Fallback: If scrolled close to top, default to "hero"
-      if (window.scrollY < 80) {
-        currentSection = "hero";
-      }
-      
-      // Fallback: If scrolled to bottom, default to last section ("contact")
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50) {
-        currentSection = "contact";
-      }
-
-      if (currentSection) {
-        setActiveSection(currentSection);
-      }
     };
 
     // Run once on mount to set initial state
     handleScroll();
-
     window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // IntersectionObserver for active section detection — no layout thrashing
+    const sectionEls = navLinks
+      .map((link) => document.getElementById(link.id))
+      .filter(Boolean) as HTMLElement[];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+
+    sectionEls.forEach((el) => observer.observe(el));
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
     };
   }, []);
 

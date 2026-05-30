@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Camera, ArrowRight } from "lucide-react";
 import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
@@ -317,9 +317,9 @@ const Sticker = ({
       )}
 
       <div
-        className="w-full flex-grow flex items-center justify-center min-h-0 will-change-transform"
+        className="w-full flex-grow flex items-center justify-center min-h-0"
         style={{
-          filter: "url(#sticker-outline-filter)",
+          filter: "drop-shadow(0 0 2.5px #ffffff) drop-shadow(0 0 2.5px #ffffff) drop-shadow(4px 5px 0.5px rgba(43,43,42,0.22))",
           transform: "translate3d(0, 0, 0)",
         }}
       >
@@ -336,12 +336,26 @@ const Sticker = ({
 
 // Blurred foreground paper plane — rendered as if close to the camera lens
 // Parallax: drifts as the section scrolls through the viewport
+// Performance: Uses IntersectionObserver to pause animation when off-screen,
+// and renders at 400px (blur hides quality loss at larger CSS size)
 const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement | null> }) => {
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
   const parallaxY = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [sectionRef]);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-35 select-none">
@@ -350,11 +364,16 @@ const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDiv
           src="/assets/skills & tools/paper_plane.png"
           alt=""
           aria-hidden="true"
-          animate={{
-            y: [0, -10, 0],
-            x: [0, 5, 0],
-            rotate: [7, 11, 7],
-          }}
+          loading="lazy"
+          animate={
+            isVisible
+              ? {
+                  y: [0, -10, 0],
+                  x: [0, 5, 0],
+                  rotate: [7, 11, 7],
+                }
+              : undefined
+          }
           transition={{
             duration: 8,
             repeat: Infinity,
@@ -364,9 +383,8 @@ const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDiv
           style={{
             left: -290,
             bottom: -260,
-            width: 950,
+            width: 400,
             filter: "blur(6px)",
-            willChange: "transform",
             transform: "translate3d(0,0,0)",
           }}
         />
@@ -391,43 +409,32 @@ export default function Skills() {
         backgroundSize: "28px 28px",
       }}
     >
-      {/* Hardware-accelerated SVG filter for premium sticker white border and shadow */}
-      <svg width="0" height="0" className="absolute pointer-events-none">
-        <defs>
-          <filter id="sticker-outline-filter" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
-            <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2.5" />
-            <feFlood floodColor="#ffffff" floodOpacity="1" result="FLOOD" />
-            <feComposite in="FLOOD" in2="DILATED" operator="in" result="OUTLINE" />
-            <feDropShadow in="OUTLINE" dx="4" dy="5" stdDeviation="0.5" floodColor="#2b2b2a" floodOpacity="0.22" result="SHADOW" />
-            <feMerge>
-              <feMergeNode in="SHADOW" />
-              <feMergeNode in="OUTLINE" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-      </svg>
+      {/* Sticker outline effect now uses CSS drop-shadow for 60fps performance */}
 
       {/* Decorative High-Fidelity Chalk Doodles in the background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.24] sm:opacity-[0.32] mix-blend-multiply">
         <img 
           src="/assets/chalk/cloud.png" 
           alt="" 
+          loading="lazy"
           className="absolute top-[18%] right-[-8%] w-[260px] sm:w-[380px] h-auto rotate-[-8deg]"
         />
         <img 
           src="/assets/chalk/paperplane.png" 
           alt="" 
+          loading="lazy"
           className="absolute top-[32%] left-[4%] w-20 sm:w-28 h-auto rotate-[-12deg]"
         />
         <img 
           src="/assets/chalk/star.png" 
           alt="" 
+          loading="lazy"
           className="absolute bottom-[18%] right-[5%] w-12 sm:w-16 h-auto rotate-[15deg]"
         />
         <img 
           src="/assets/chalk/camera.png" 
           alt="" 
+          loading="lazy"
           className="absolute bottom-[8%] left-[-4%] w-[220px] sm:w-[320px] h-auto rotate-[-15deg]"
         />
       </div>
@@ -452,6 +459,7 @@ export default function Skills() {
           <img
             src="/assets/skills & tools/title.png"
             alt="Skills & Tech Stack"
+            loading="lazy"
             className="w-full h-auto object-contain filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.22)] transition-transform duration-300 hover:scale-[1.03]"
           />
         </motion.div>

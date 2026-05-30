@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 
 export default function Contact() {
@@ -55,23 +55,25 @@ export default function Contact() {
   const xCta = useTransform(mouseXSpring, [-400, 400], [-30, 30]);
   const yMouseCta = useTransform(mouseYSpring, [-400, 400], [-30, 30]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    
-    const x = e.clientX - rect.left - width / 2;
-    const y = e.clientY - rect.top - height / 2;
-    
-    mouseX.set(x);
-    mouseY.set(y);
-  };
+  // rAF-throttled mouse move handler — prevents computing 28 motion values on every pixel
+  const rafRef = useRef<number>(0);
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (rafRef.current) return; // Skip if a frame is already pending
+    rafRef.current = requestAnimationFrame(() => {
+      if (!containerRef.current) { rafRef.current = 0; return; }
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      mouseX.set(x);
+      mouseY.set(y);
+      rafRef.current = 0;
+    });
+  }, [mouseX, mouseY]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     mouseX.set(0);
     mouseY.set(0);
-  };
+  }, [mouseX, mouseY]);
 
   return (
     <section 
@@ -101,53 +103,53 @@ export default function Contact() {
         className="w-full aspect-[16/9] relative flex items-center justify-center overflow-hidden bg-milky-surface"
       >
         {/* Layer 1: Background Desk */}
-        <motion.div style={{ y: yLayer1 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer1 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer1, translateY: yMouseLayer1 }} className="w-full h-full">
-            <img src="/assets/contact/layer-1.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-1.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
         {/* Layer 2 */}
-        <motion.div style={{ y: yLayer2 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer2 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer2, translateY: yMouseLayer2 }} className="w-full h-full">
-            <img src="/assets/contact/layer-2.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-2.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
         {/* Layer 3 */}
-        <motion.div style={{ y: yLayer3 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer3 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer3, translateY: yMouseLayer3 }} className="w-full h-full">
-            <img src="/assets/contact/layer-3.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-3.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
         {/* Layer 4: Section Title ("SEND A NOTE" graphics) */}
-        <motion.div style={{ y: yLayer4 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer4 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer4, translateY: yMouseLayer4 }} className="w-full h-full">
             <div className="w-full h-full contact-title-float">
-              <img src="/assets/contact/layer-4.png" alt="" className="w-full h-full object-cover" />
+              <img src="/assets/contact/layer-4.png" alt="" loading="lazy" className="w-full h-full object-cover" />
             </div>
           </motion.div>
         </motion.div>
 
         {/* Layer 5 */}
-        <motion.div style={{ y: yLayer5 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer5 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer5, translateY: yMouseLayer5 }} className="w-full h-full">
-            <img src="/assets/contact/layer-5.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-5.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
         {/* Layer 6 */}
-        <motion.div style={{ y: yLayer6 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer6 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer6, translateY: yMouseLayer6 }} className="w-full h-full">
-            <img src="/assets/contact/layer-6.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-6.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
         {/* Layer 7: Accents/pins */}
-        <motion.div style={{ y: yLayer7 }} className="absolute inset-0 w-full h-full pointer-events-none">
+        <motion.div style={{ y: yLayer7 }} className="absolute inset-0 w-full h-full pointer-events-none will-change-transform">
           <motion.div style={{ translateX: xLayer7, translateY: yMouseLayer7 }} className="w-full h-full">
-            <img src="/assets/contact/layer-7.png" alt="" className="w-full h-full object-cover" />
+            <img src="/assets/contact/layer-7.png" alt="" loading="lazy" className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
 
@@ -172,7 +174,7 @@ export default function Contact() {
                 className="w-full h-full rounded-md cursor-pointer pointer-events-auto block"
                 title="Send Joseph Benedict a Note!"
               >
-                <img src="/assets/contact/cta-button.png" alt="Send a Note CTA" className="w-full h-full object-contain filter drop-shadow-[2px_4px_3px_rgba(0,0,0,0.15)]" />
+                <img src="/assets/contact/cta-button.png" alt="Send a Note CTA" loading="lazy" className="w-full h-full object-contain filter drop-shadow-[2px_4px_3px_rgba(0,0,0,0.15)]" />
               </motion.a>
             </motion.div>
 

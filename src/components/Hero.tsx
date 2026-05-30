@@ -55,6 +55,8 @@ export default function Hero({ loaderCompleted }: HeroProps) {
         <img 
           src="/hero_image.png" 
           alt="Hero Background" 
+          loading="eager"
+          fetchPriority="high"
           className="w-full h-full object-cover opacity-100" 
         />
       </div>

@@ -277,6 +277,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
   const [galleryPage, setGalleryPage] = useState(1);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
   const [longImages, setLongImages] = useState<Record<string, boolean>>({});
+  const [portraitImages, setPortraitImages] = useState<Record<string, boolean>>({});
   const [zoomScale, setZoomScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
   const screenshotsSectionRef = useRef<HTMLDivElement>(null);
@@ -368,9 +369,17 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>, src: string) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
-    // Classify as long vertical screenshot if ratio > 1.25 and NOT a mobile project
-    const isMobile = selectedProject?.title.toLowerCase().includes("(mobile)");
-    if (naturalHeight > naturalWidth * 1.25 && !isMobile) {
+    if (naturalHeight > naturalWidth) {
+      setPortraitImages(prev => ({ ...prev, [src]: true }));
+    }
+    
+    const isMobile = selectedProject?.id.toLowerCase().includes("mobile") || selectedProject?.title.toLowerCase().includes("mobile");
+    const ratio = naturalHeight / naturalWidth;
+    
+    // Classify as long vertical screenshot if:
+    // - Non-mobile project and ratio > 1.25
+    // - Mobile project and ratio > 2.2 (truly long scrollable screen)
+    if ((!isMobile && ratio > 1.25) || (isMobile && ratio > 2.2)) {
       setLongImages(prev => ({ ...prev, [src]: true }));
     }
   };
@@ -426,38 +435,43 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
 
   return (
-    <section
-      id="projects"
-      ref={containerRef}
-      className="relative py-20 sm:py-28 w-full bg-milky transition-colors duration-500 overflow-visible"
-      style={{
-        backgroundImage: `
-          linear-gradient(color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px),
-          linear-gradient(90deg, color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px)
-        `,
-        backgroundSize: "28px 28px",
-      }}
-    >
+    <>
+      <section
+        id="projects"
+        ref={containerRef}
+        className="relative py-20 sm:py-28 w-full bg-milky transition-colors duration-500 overflow-visible"
+        style={{
+          backgroundImage: `
+            linear-gradient(color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px),
+            linear-gradient(90deg, color-mix(in srgb, var(--theme-olive-primary) 7%, transparent) 1px, transparent 1px)
+          `,
+          backgroundSize: "28px 28px",
+        }}
+      >
       {/* Decorative High-Fidelity Chalk Doodles in the background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.24] sm:opacity-[0.32] mix-blend-multiply">
         <img 
           src="/assets/chalk/cloud.png" 
           alt="" 
+          loading="lazy"
           className="absolute top-[6%] right-[-6%] w-[260px] sm:w-[350px] h-auto rotate-[-8deg]"
         />
         <img 
           src="/assets/chalk/swirl.png" 
           alt="" 
+          loading="lazy"
           className="absolute top-[18%] left-[2%] w-20 sm:w-28 h-auto rotate-[10deg]"
         />
         <img 
           src="/assets/chalk/star.png" 
           alt="" 
+          loading="lazy"
           className="absolute bottom-[35%] left-[4%] w-10 sm:w-14 h-auto rotate-[-15deg]"
         />
         <img 
           src="/assets/chalk/frog.png" 
           alt="" 
+          loading="lazy"
           className="absolute bottom-[18%] right-[-5%] w-[200px] sm:w-[260px] h-auto rotate-[15deg]"
         />
       </div>
@@ -479,6 +493,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           <img
             src="/Projects/projects-title.png"
             alt="Projects Title"
+            loading="lazy"
             className="w-auto h-24 sm:h-68 md:h-72 object-contain select-none pointer-events-auto filter drop-shadow-[8px_12px_4px_rgba(0,0,0,0.18)] transition-transform duration-300 hover:scale-[1.03]"
           />
         </motion.div>
@@ -538,10 +553,13 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 )}
 
                 {/* Polaroid Photo Frame */}
-                <div className="aspect-[16/10] w-full rounded-none overflow-hidden border-2 border-[#2b2b2a] bg-milky-surface relative shadow-sm transition-all duration-500">
+                <div className={`w-full rounded-none overflow-hidden border-2 border-[#2b2b2a] bg-milky-surface relative shadow-sm transition-all duration-500 ${
+                  project.isThumbnailPortrait ? "aspect-[10/13] max-w-[340px] mx-auto" : "aspect-[16/10]"
+                }`}>
                   <img
                     src={project.thumbnail}
                     alt={project.title}
+                    loading="lazy"
                     className="w-full h-full object-cover object-top filter contrast-[1.02] brightness-[0.98]"
                   />
                   <div className="absolute inset-0 bg-[#8b5a2b]/0 group-hover:bg-[#8b5a2b]/5 transition-colors duration-500" />
@@ -586,9 +604,10 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           })}
         </div>
       </div>
+    </section>
 
-      {/* Modern Slide-up Full Screen Modal Details */}
-      <AnimatePresence>
+    {/* Modern Slide-up Full Screen Modal Details */}
+    <AnimatePresence>
         {selectedProject && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -772,21 +791,23 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                         >
                           {/* Card Graphic Container */}
                           <div
-                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${selectedProject.title.toLowerCase().includes("(mobile)")
-                              ? "aspect-[10/16] max-w-[320px] mx-auto"
-                              : "aspect-[16/10]"
-                              }`}
+                            className={`w-full rounded-[24px] border-2 border-matcha/20 hover:border-matcha/60 bg-milky-surface overflow-hidden shadow-sm hover:shadow-[0_12px_24px_rgba(65,70,42,0.12)] transition-all duration-300 flex items-center justify-center relative ${
+                              portraitImages[src] || selectedProject.id.toLowerCase().includes("mobile") || selectedProject.title.toLowerCase().includes("mobile")
+                                ? "aspect-[10/16] max-w-[320px] mx-auto"
+                                : "aspect-[16/10]"
+                            }`}
                           >
                             <img
                               src={src}
                               alt={title}
                               onLoad={(e) => handleImageLoad(e, src)}
-                              className={`w-full h-full transition-transform duration-500 group-hover/card:scale-[1.03] ${selectedProject.title.toLowerCase().includes("(mobile)")
-                                ? "object-cover object-top"
-                                : isLong
+                              className={`w-full h-full transition-transform duration-500 group-hover/card:scale-[1.03] ${
+                                portraitImages[src] || selectedProject.id.toLowerCase().includes("mobile") || selectedProject.title.toLowerCase().includes("mobile")
                                   ? "object-cover object-top"
-                                  : "object-cover object-center"
-                                }`}
+                                  : isLong
+                                    ? "object-cover object-top"
+                                    : "object-cover object-center"
+                              }`}
                             />
 
                             {/* Bottom Truncation Gradient Overlay & Action Badge */}
@@ -880,31 +901,39 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                 </span>
 
                 {/* Next Project Block Button */}
-                <div
-                  onClick={handleNextProject}
-                  className="flex items-center justify-between bg-milky-surface border border-matcha/30 hover:border-matcha hover:shadow-md p-6 rounded-[30px] cursor-pointer transition-all duration-300 max-w-[800px] mx-auto group"
-                >
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-14 rounded-md overflow-hidden bg-milky flex-shrink-0 border border-matcha/10">
-                      <img
-                        src={projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].thumbnail}
-                        alt="Next Project Thumbnail"
-                        className="w-full h-full object-cover object-top"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-display font-bold text-lg text-olive-primary">
-                        {projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].title}
-                      </h3>
-                      <p className="text-olive-secondary text-xs font-medium">
-                        {projects[(projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length].description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-12 h-12 rounded-full bg-milky flex items-center justify-center text-olive-primary group-hover:bg-matcha group-hover:text-milky-surface transition-all duration-300">
-                    <ArrowRight className="w-5 h-5" />
-                  </div>
-                </div>
+                {(() => {
+                   const nextProjIndex = (projects.findIndex((p) => p.id === selectedProject.id) + 1) % projects.length;
+                   const nextProj = projects[nextProjIndex];
+                   return (
+                     <div
+                       onClick={handleNextProject}
+                       className="flex items-center justify-between bg-milky-surface border border-matcha/30 hover:border-matcha hover:shadow-md p-6 rounded-[30px] cursor-pointer transition-all duration-300 max-w-[800px] mx-auto group"
+                     >
+                       <div className="flex items-center gap-6">
+                         <div className={`rounded-md overflow-hidden bg-milky flex-shrink-0 border border-matcha/10 transition-all flex items-center justify-center ${
+                           nextProj.isThumbnailPortrait ? "w-11 h-16" : "w-20 h-14"
+                         }`}>
+                           <img
+                             src={nextProj.thumbnail}
+                             alt="Next Project Thumbnail"
+                             className="w-full h-full object-cover object-top"
+                           />
+                         </div>
+                         <div>
+                           <h3 className="font-display font-bold text-lg text-olive-primary">
+                             {nextProj.title}
+                           </h3>
+                           <p className="text-olive-secondary text-xs font-medium">
+                             {nextProj.description}
+                           </p>
+                         </div>
+                       </div>
+                       <div className="w-12 h-12 rounded-full bg-milky flex items-center justify-center text-olive-primary group-hover:bg-matcha group-hover:text-milky-surface transition-all duration-300">
+                         <ArrowRight className="w-5 h-5" />
+                       </div>
+                     </div>
+                   );
+                 })()}
 
                 {/* Return/Actions */}
                 <div className="flex flex-col items-center gap-12 mt-16 mb-8">
@@ -946,6 +975,7 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
             exit={{ opacity: 0 }}
             className="fixed inset-0 w-full h-full bg-black/95 backdrop-blur-md z-[100] flex flex-col justify-between items-center py-6 select-none"
             onClick={() => setLightboxImageIndex(null)}
+            data-lenis-prevent="true"
           >
             {/* Lightbox Header with Title & Info */}
             <div
@@ -1000,18 +1030,18 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
 
               {/* The Image Display with Zoom capabilities */}
               <div
-                ref={!longImages[selectedProject.images[lightboxImageIndex]] ? containerRef : undefined}
-                onWheel={!longImages[selectedProject.images[lightboxImageIndex]] ? handleWheel : undefined}
-                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 ${longImages[selectedProject.images[lightboxImageIndex]]
-                  ? "overflow-y-auto w-full max-w-[850px] aspect-[10/16] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar"
-                  : `flex items-center justify-center rounded-lg bg-black/20 ${zoomScale > 1 ? "overflow-visible" : "overflow-hidden"}`
-                  }`}
+                onWheel={handleWheel}
+                className={`relative max-w-[90vw] max-h-[66vh] transition-all duration-300 ${
+                  longImages[selectedProject.images[lightboxImageIndex]] && zoomScale === 1
+                    ? "overflow-y-auto h-[66vh] max-h-[66vh] w-auto aspect-[10/16] max-w-[90vw] bg-zinc-900/40 border border-white/10 rounded-lg p-2 custom-lightbox-scrollbar"
+                    : `flex items-center justify-center rounded-lg bg-black/20 ${zoomScale > 1 ? "overflow-visible" : "overflow-hidden"}`
+                }`}
               >
                 <motion.img
                   key={selectedProject.images[lightboxImageIndex]}
                   src={selectedProject.images[lightboxImageIndex]}
                   alt={formatImageTitle(selectedProject.images[lightboxImageIndex], selectedProject.id)}
-                  drag={!longImages[selectedProject.images[lightboxImageIndex]] && zoomScale > 1}
+                  drag={zoomScale > 1}
                   dragConstraints={{
                     left: -500 * (zoomScale - 1),
                     right: 500 * (zoomScale - 1),
@@ -1021,64 +1051,63 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
                   dragElastic={0}
                   dragMomentum={false}
                   animate={{
-                    scale: !longImages[selectedProject.images[lightboxImageIndex]] ? zoomScale : 1
+                    scale: zoomScale
                   }}
                   transition={{ duration: 0.15, ease: "easeOut" }}
                   style={{
                     x: dragX,
                     y: dragY,
-                    cursor: !longImages[selectedProject.images[lightboxImageIndex]] && zoomScale > 1 ? "grab" : "default"
+                    cursor: zoomScale > 1 ? "grab" : "default"
                   }}
-                  className={`shadow-2xl rounded-sm select-none ${longImages[selectedProject.images[lightboxImageIndex]]
-                    ? "w-full h-auto object-contain object-top"
-                    : "max-w-full max-h-[64vh] object-contain"
-                    }`}
+                  className={`shadow-2xl rounded-sm select-none ${
+                    longImages[selectedProject.images[lightboxImageIndex]] && zoomScale === 1
+                      ? "w-full h-auto object-contain object-top"
+                      : "max-w-full max-h-[64vh] object-contain"
+                  }`}
                 />
               </div>
 
-              {/* Floating Zoom Control Bar under the image (only for standard landscape/aspect ratio photos) */}
-              {!longImages[selectedProject.images[lightboxImageIndex]] && (
-                <div className="flex items-center gap-3 bg-white/[0.04] border border-white/10 px-4 py-2 rounded-full mt-4 backdrop-blur-md shadow-lg select-none z-50">
+              {/* Floating Zoom Control Bar under the image */}
+              <div className="flex items-center gap-3 bg-white/[0.04] border border-white/10 px-4 py-2 rounded-full mt-4 backdrop-blur-md shadow-lg select-none z-50">
+                <button
+                  onClick={() => setZoomScale(prev => Math.max(1, prev - 0.25))}
+                  className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+
+                <input
+                  type="range"
+                  min="1"
+                  max="4"
+                  step="0.05"
+                  value={zoomScale}
+                  onChange={(e) => setZoomScale(parseFloat(e.target.value))}
+                  className="w-24 sm:w-36 h-1 bg-white/20 hover:bg-white/30 rounded-lg appearance-none cursor-pointer accent-matcha outline-none transition-all"
+                />
+
+                <button
+                  onClick={() => setZoomScale(prev => Math.min(4, prev + 0.25))}
+                  className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+
+                <span className="text-[10px] text-white/50 font-bold font-mono min-w-[30px] text-right">
+                  {Math.round(zoomScale * 100)}%
+                </span>
+
+                {zoomScale > 1 && (
                   <button
-                    onClick={() => setZoomScale(prev => Math.max(1, prev - 0.25))}
-                    className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
-                    title="Zoom Out"
+                    onClick={() => setZoomScale(1)}
+                    className="text-[9px] text-matcha font-extrabold uppercase tracking-wider pl-3 border-l border-white/10 hover:text-white cursor-pointer transition-colors"
                   >
-                    <ZoomOut className="w-4 h-4" />
+                    Reset
                   </button>
-
-                  <input
-                    type="range"
-                    min="1"
-                    max="4"
-                    step="0.05"
-                    value={zoomScale}
-                    onChange={(e) => setZoomScale(parseFloat(e.target.value))}
-                    className="w-24 sm:w-36 h-1 bg-white/20 hover:bg-white/30 rounded-lg appearance-none cursor-pointer accent-matcha outline-none transition-all"
-                  />
-
-                  <button
-                    onClick={() => setZoomScale(prev => Math.min(4, prev + 0.25))}
-                    className="text-white/60 hover:text-matcha active:scale-95 transition-all cursor-pointer"
-                    title="Zoom In"
-                  >
-                    <ZoomIn className="w-4 h-4" />
-                  </button>
-
-                  <span className="text-[10px] text-white/50 font-bold font-mono min-w-[30px] text-right">
-                    {Math.round(zoomScale * 100)}%
-                  </span>
-
-                  {zoomScale > 1 && (
-                    <button
-                      onClick={() => setZoomScale(1)}
-                      className="text-[9px] text-matcha font-extrabold uppercase tracking-wider pl-3 border-l border-white/10 hover:text-white cursor-pointer transition-colors"
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Navigation - Right Arrow */}
               <div className="absolute right-6 z-50 max-sm:right-2">
@@ -1109,6 +1138,6 @@ export default function Projects({ initialProjects = [] }: ProjectsProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </section>
+    </>
   );
 }
