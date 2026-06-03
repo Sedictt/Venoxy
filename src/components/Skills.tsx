@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useRef } from "react";
+import { motion } from "framer-motion";
 import { Camera, ArrowRight } from "lucide-react";
 import { TransitionLink as Link } from "@/components/transitions/PageTransitionProvider";
 import { Swanky_and_Moo_Moo } from "next/font/google";
@@ -334,65 +334,6 @@ const Sticker = ({
   );
 };
 
-// Blurred foreground paper plane — rendered as if close to the camera lens
-// Parallax: drifts as the section scrolls through the viewport
-// Performance: Uses IntersectionObserver to pause animation when off-screen,
-// and renders at 400px (blur hides quality loss at larger CSS size)
-const BlurredPaperPlane = ({ sectionRef }: { sectionRef: React.RefObject<HTMLDivElement | null> }) => {
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const parallaxY = useTransform(scrollYProgress, [0, 1], [60, -60]);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry.isIntersecting),
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [sectionRef]);
-
-  return (
-    <div className="absolute inset-0 pointer-events-none z-35 select-none">
-      <motion.div style={{ y: parallaxY, willChange: "transform" }}>
-        <motion.img
-          src="/assets/skills & tools/paper_plane.png"
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          animate={
-            isVisible
-              ? {
-                  y: [0, -10, 0],
-                  x: [0, 5, 0],
-                  rotate: [7, 11, 7],
-                }
-              : undefined
-          }
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute h-auto object-contain"
-          style={{
-            left: -290,
-            bottom: -260,
-            width: 400,
-            filter: "blur(6px)",
-            transform: "translate3d(0,0,0)",
-          }}
-        />
-      </motion.div>
-    </div>
-  );
-};
-
 export default function Skills() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -438,9 +379,6 @@ export default function Skills() {
           className="absolute bottom-[8%] left-[-4%] w-[220px] sm:w-[320px] h-auto rotate-[-15deg]"
         />
       </div>
-
-      {/* Realistic blurred Polaroid paper plane flying in the foreground */}
-      <BlurredPaperPlane sectionRef={containerRef} />
 
       {/* Realistic physical coffee ring stains stamped on the desk grid paper */}
       <CoffeeStain className="bottom-12 left-10 opacity-[0.55] scale-110 sm:scale-125" />
